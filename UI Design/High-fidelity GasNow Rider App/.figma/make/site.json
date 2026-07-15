@@ -1,0 +1,10 @@
+{
+  "description": "Connects delivery riders with gas vendors and customers, enabling efficient order management, navigation, and earnings tracking in a user-friendly mobile interface.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

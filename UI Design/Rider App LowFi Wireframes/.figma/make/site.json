@@ -1,0 +1,10 @@
+{
+  "description": "Streamline delivery operations for riders with an intuitive app that facilitates job acceptance, navigation, and earnings management.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

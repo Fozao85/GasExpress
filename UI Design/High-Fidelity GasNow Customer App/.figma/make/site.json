@@ -1,0 +1,10 @@
+{
+  "description": "Enables users to discover local LPG vendors, order cooking gas, securely pay, and track deliveries in real-time through a seamless mobile marketplace.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

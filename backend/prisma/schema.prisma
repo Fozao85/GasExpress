@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  VENDOR
+  RIDER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum OrderStatus {
+  PENDING
+  VENDOR_ACCEPTED
+  PREPARING
+  READY_FOR_PICKUP
+  RIDER_ASSIGNED
+  PICKED_UP
+  ON_THE_WAY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RiderAvailability {
+  ONLINE
+  OFFLINE
+  BUSY
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  fullName     String     @map("full_name")
+  phone        String     @unique
+  email        String?
+  passwordHash String     @map("password_hash")
+  role         UserRole
+  status       UserStatus @default(PENDING)
+  lastLogin    DateTime?  @map("last_login")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  customerProfile CustomerProfile?
+  vendorProfile   VendorProfile?
+  riderProfile    RiderProfile?
+  addresses       Address[]
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+
+  @@map("users")
+}
+
+model CustomerProfile {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @unique @map("user_id") @db.Uuid
+  defaultAddressId String?  @map("default_address_id") @db.Uuid
+  preferredPayment String?  @map("preferred_payment")
+  loyaltyPoints    Int      @default(0) @map("loyalty_points")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultAddress Address? @relation("DefaultAddress", fields: [defaultAddressId], references: [id])
+  orders         Order[]  @relation("CustomerOrders")
+  reviews        Review[]
+
+  @@map("customer_profiles")
+}
+
+model VendorProfile {
+  id                 String             @id @default(uuid()) @db.Uuid
+  userId             String             @unique @map("user_id") @db.Uuid
+  businessName       String             @map("business_name")
+  businessLicense    String?            @map("business_license")
+  phone              String
+  address            String
+  latitude           Decimal?           @db.Decimal(10, 7)
+  longitude          Decimal?           @db.Decimal(10, 7)
+  openingTime        String?            @map("opening_time")
+  closingTime        String?            @map("closing_time")
+  verificationStatus VerificationStatus @default(PENDING) @map("verification_status")
+  averageRating      Decimal?           @default(0) @map("average_rating") @db.Decimal(3, 2)
+  isOpen             Boolean            @default(false) @map("is_open")
+  createdAt          DateTime           @default(now()) @map("created_at")
+
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inventory VendorInventory[]
+  orders    Order[]
+
+  @@map("vendor_profiles")
+}
+
+model RiderProfile {
+  id              String            @id @default(uuid()) @db.Uuid
+  userId          String            @unique @map("user_id") @db.Uuid
+  vehicleType     String?           @map("vehicle_type")
+  licenseNumber   String?           @map("license_number")
+  nationalId      String?           @map("national_id")
+  availability    RiderAvailability @default(OFFLINE)
+  latitude        Decimal?          @db.Decimal(10, 7)
+  longitude       Decimal?          @db.Decimal(10, 7)
+  averageRating   Decimal?          @default(0) @map("average_rating") @db.Decimal(3, 2)
+  totalDeliveries Int               @default(0) @map("total_deliveries")
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries     Delivery[]
+  assignedOrders Order[]    @relation("RiderOrders")
+
+  @@map("rider_profiles")
+}
+
+model Address {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  label       String?
+  addressLine String   @map("address_line")
+  city        String?
+  region      String?
+  latitude    Decimal? @db.Decimal(10, 7)
+  longitude   Decimal? @db.Decimal(10, 7)
+  isDefault   Boolean  @default(false) @map("is_default")
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customerProfiles CustomerProfile[] @relation("DefaultAddress")
+  orders           Order[]
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model CylinderType {
+  id          String  @id @default(uuid()) @db.Uuid
+  sizeKg      Decimal @map("size_kg") @db.Decimal(5, 2)
+  description String?
+
+  inventory  VendorInventory[]
+  orderItems OrderItem[]
+
+  @@map("cylinder_types")
+}
+
+model VendorInventory {
+  id             String   @id @default(uuid()) @db.Uuid
+  vendorId       String   @map("vendor_id") @db.Uuid
+  cylinderTypeId String   @map("cylinder_type_id") @db.Uuid
+  stockQuantity  Int      @default(0) @map("stock_quantity")
+  price          Decimal  @db.Decimal(10, 2)
+  lastUpdated    DateTime @default(now()) @map("last_updated")
+
+  vendor       VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  cylinderType CylinderType  @relation(fields: [cylinderTypeId], references: [id])
+
+  @@unique([vendorId, cylinderTypeId])
+  @@index([vendorId])
+  @@map("vendor_inventory")
+}
+
+model Order {
+  id                String        @id @default(uuid()) @db.Uuid
+  customerId        String        @map("customer_id") @db.Uuid
+  vendorId          String        @map("vendor_id") @db.Uuid
+  riderId           String?       @map("rider_id") @db.Uuid
+  deliveryAddressId String        @map("delivery_address_id") @db.Uuid
+  subtotal          Decimal       @db.Decimal(10, 2)
+  deliveryFee       Decimal       @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  total             Decimal       @db.Decimal(10, 2)
+  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
+  orderStatus       OrderStatus   @default(PENDING) @map("order_status")
+  createdAt         DateTime      @default(now()) @map("created_at")
+
+  customer CustomerProfile @relation("CustomerOrders", fields: [customerId], references: [id])
+  vendor   VendorProfile   @relation(fields: [vendorId], references: [id])
+  rider    RiderProfile?   @relation("RiderOrders", fields: [riderId], references: [id])
+  address  Address         @relation(fields: [deliveryAddressId], references: [id])
+  items    OrderItem[]
+  payment  Payment?
+  delivery Delivery?
+  review   Review?
+
+  @@index([customerId])
+  @@index([vendorId])
+  @@index([riderId])
+  @@index([orderStatus])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(uuid()) @db.Uuid
+  orderId        String  @map("order_id") @db.Uuid
+  cylinderTypeId String  @map("cylinder_type_id") @db.Uuid
+  quantity       Int
+  unitPrice      Decimal @map("unit_price") @db.Decimal(10, 2)
+  subtotal       Decimal @db.Decimal(10, 2)
+
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  cylinderType CylinderType @relation(fields: [cylinderTypeId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id                   String        @id @default(uuid()) @db.Uuid
+  orderId              String        @unique @map("order_id") @db.Uuid
+  paymentMethod        PaymentMethod @map("payment_method")
+  transactionReference String?       @map("transaction_reference")
+  amount               Decimal       @db.Decimal(10, 2)
+  paymentStatus        PaymentStatus @default(PENDING) @map("payment_status")
+  paidAt               DateTime?     @map("paid_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Delivery {
+  id             String    @id @default(uuid()) @db.Uuid
+  orderId        String    @unique @map("order_id") @db.Uuid
+  riderId        String    @map("rider_id") @db.Uuid
+  pickupTime     DateTime? @map("pickup_time")
+  departureTime  DateTime? @map("departure_time")
+  arrivalTime    DateTime? @map("arrival_time")
+  completionTime DateTime? @map("completion_time")
+  deliveryNotes  String?   @map("delivery_notes")
+
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  rider          RiderProfile    @relation(fields: [riderId], references: [id])
+  trackingEvents TrackingEvent[]
+
+  @@map("deliveries")
+}
+
+model TrackingEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  deliveryId String   @map("delivery_id") @db.Uuid
+  latitude   Decimal  @db.Decimal(10, 7)
+  longitude  Decimal  @db.Decimal(10, 7)
+  timestamp  DateTime @default(now())
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId])
+  @@map("tracking_events")
+}
+
+model Review {
+  id           String   @id @default(uuid()) @db.Uuid
+  orderId      String   @unique @map("order_id") @db.Uuid
+  customerId   String   @map("customer_id") @db.Uuid
+  vendorRating Int?     @map("vendor_rating")
+  riderRating  Int?     @map("rider_rating")
+  comment      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  order    Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Notification {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  title            String
+  body             String
+  notificationType String   @map("notification_type")
+  isRead           Boolean  @default(false) @map("is_read")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model Promotion {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String
+  discountType String   @map("discount_type")
+  value        Decimal  @db.Decimal(10, 2)
+  startDate    DateTime @map("start_date")
+  endDate      DateTime @map("end_date")
+  active       Boolean  @default(true)
+
+  @@map("promotions")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id") @db.Uuid
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  /* Minimum font size for accessibility */
+  * {
+    @apply text-base;
+  }
+}
+
+@layer components {
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px];
+  }
+}
