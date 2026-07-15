@@ -124,6 +124,10 @@ model VendorProfile {
   inventory VendorInventory[]
   orders    Order[]
 
+  @@index([latitude, longitude])
+  @@index([verificationStatus])
+  @@index([isOpen])
+  @@index([averageRating])
   @@map("vendor_profiles")
 }
 
@@ -174,6 +178,7 @@ model CylinderType {
   inventory  VendorInventory[]
   orderItems OrderItem[]
 
+  @@index([sizeKg])
   @@map("cylinder_types")
 }
 
@@ -190,6 +195,8 @@ model VendorInventory {
 
   @@unique([vendorId, cylinderTypeId])
   @@index([vendorId])
+  @@index([cylinderTypeId])
+  @@index([stockQuantity])
   @@map("vendor_inventory")
 }
 
@@ -351,6 +358,7 @@ model Promotion {
   endDate      DateTime @map("end_date")
   active       Boolean  @default(true)
 
+  @@index([active, startDate, endDate])
   @@map("promotions")
 }
 

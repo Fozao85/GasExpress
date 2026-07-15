@@ -7,6 +7,9 @@ import { config } from './config';
 import { errorHandler, requestLogger, notFoundHandler } from './common/middleware';
 import { swaggerSpec } from './docs/swagger';
 import { authRouter } from './modules/auth';
+import { vendorRouter } from './modules/vendors';
+import { categoryRouter } from './modules/categories';
+import { promotionRouter } from './modules/promotions';
 
 const app = express();
 
@@ -80,6 +83,9 @@ app.get('/api/v1/health', (_req, res) => {
 
 // Routes
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/vendors', vendorRouter);
+app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/promotions', promotionRouter);
 
 // 404 handler
 app.use(notFoundHandler);

@@ -37,4 +37,11 @@ export const config = {
   log: {
     level: process.env.LOG_LEVEL || 'info',
   },
+
+  vendor: {
+    defaultRadius: parseInt(process.env.VENDOR_DEFAULT_RADIUS || '15', 10),
+    maxRadius: parseInt(process.env.VENDOR_MAX_RADIUS || '50', 10),
+    defaultLimit: parseInt(process.env.VENDOR_DEFAULT_LIMIT || '20', 10),
+    maxLimit: parseInt(process.env.VENDOR_MAX_LIMIT || '100', 10),
+  },
 };

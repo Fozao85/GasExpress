@@ -22,12 +22,17 @@ import { RiderOtpScreen } from './features/rider/screens/OtpScreen';
 
 import { AdminLoginScreen } from './features/admin/screens/LoginScreen';
 
+import { HomeDashboard } from './features/customer/screens/HomeDashboard';
+import { VendorListScreen } from './features/customer/screens/VendorListScreen';
+import { VendorDetailScreen } from './features/customer/screens/VendorDetailScreen';
+import { SearchResultsScreen } from './features/customer/screens/SearchResultsScreen';
+import { PromotionsScreen } from './features/customer/screens/PromotionsScreen';
+
 export function App() {
   return (
     <AuthProvider>
       <Routes>
         {/* Auth screens — no layout */}
-        {/* Customer */}
         <Route path="/" element={<SplashScreen />} />
         <Route path="/customer/splash" element={<SplashScreen />} />
         <Route path="/customer/welcome" element={<WelcomeScreen />} />
@@ -37,34 +42,45 @@ export function App() {
         <Route path="/customer/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/customer/reset-password" element={<ResetPasswordScreen />} />
 
-        {/* Vendor */}
         <Route path="/vendor/login" element={<VendorLoginScreen />} />
         <Route path="/vendor/register" element={<VendorRegisterScreen />} />
         <Route path="/vendor/otp" element={<VendorOtpScreen />} />
         <Route path="/vendor/pending-approval" element={<PendingApprovalScreen />} />
 
-        {/* Rider */}
         <Route path="/rider/login" element={<RiderLoginScreen />} />
         <Route path="/rider/register" element={<RiderRegisterScreen />} />
         <Route path="/rider/otp" element={<RiderOtpScreen />} />
 
-        {/* Admin */}
         <Route path="/admin/login" element={<AdminLoginScreen />} />
 
-        {/* Protected routes — authentication required + role check */}
+        {/* Customer protected routes */}
         <Route element={<ProtectedRoute requiredRole="CUSTOMER" redirectTo="/customer/login" />}>
           <Route element={<MainLayout />}>
+            <Route path="/customer/dashboard" element={<HomeDashboard />} />
+            <Route path="/customer/vendors" element={<VendorListScreen />} />
+            <Route path="/customer/vendors/:id" element={<VendorDetailScreen />} />
+            <Route path="/customer/search" element={<SearchResultsScreen />} />
+            <Route path="/customer/promotions" element={<PromotionsScreen />} />
             <Route
-              path="/customer/dashboard"
+              path="/customer/orders"
               element={
                 <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">Customer Dashboard</h1>
+                  <h1 className="text-2xl font-bold text-primary-500">My Orders</h1>
+                </div>
+              }
+            />
+            <Route
+              path="/customer/support"
+              element={
+                <div className="p-4">
+                  <h1 className="text-2xl font-bold text-primary-500">Support</h1>
                 </div>
               }
             />
           </Route>
         </Route>
 
+        {/* Vendor protected routes */}
         <Route element={<ProtectedRoute requiredRole="VENDOR" redirectTo="/vendor/login" />}>
           <Route element={<MainLayout />}>
             <Route
@@ -78,6 +94,7 @@ export function App() {
           </Route>
         </Route>
 
+        {/* Rider protected routes */}
         <Route element={<ProtectedRoute requiredRole="RIDER" redirectTo="/rider/login" />}>
           <Route element={<MainLayout />}>
             <Route
@@ -91,6 +108,7 @@ export function App() {
           </Route>
         </Route>
 
+        {/* Admin protected routes */}
         <Route element={<ProtectedRoute requiredRole="ADMIN" redirectTo="/admin/login" />}>
           <Route element={<MainLayout />}>
             <Route
