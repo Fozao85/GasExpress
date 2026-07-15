@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
 import { errorHandler, requestLogger, notFoundHandler } from './common/middleware';
 import { swaggerSpec } from './docs/swagger';
+import { authRouter } from './modules/auth';
 
 const app = express();
 
@@ -77,9 +78,8 @@ app.get('/api/v1/health', (_req, res) => {
   });
 });
 
-// Routes (placeholder — modules will be added in future sprints)
-// app.use('/api/v1/auth', authRouter);
-// app.use('/api/v1/users', usersRouter);
+// Routes
+app.use('/api/v1/auth', authRouter);
 
 // 404 handler
 app.use(notFoundHandler);
