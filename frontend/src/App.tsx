@@ -27,6 +27,10 @@ import { VendorListScreen } from './features/customer/screens/VendorListScreen';
 import { VendorDetailScreen } from './features/customer/screens/VendorDetailScreen';
 import { SearchResultsScreen } from './features/customer/screens/SearchResultsScreen';
 import { PromotionsScreen } from './features/customer/screens/PromotionsScreen';
+import { CartScreen } from './features/customer/screens/CartScreen';
+import { CheckoutScreen } from './features/customer/screens/CheckoutScreen';
+import { OrderConfirmationScreen } from './features/customer/screens/OrderConfirmationScreen';
+import { OrdersScreen } from './features/customer/screens/OrdersScreen';
 
 export function App() {
   return (
@@ -61,14 +65,10 @@ export function App() {
             <Route path="/customer/vendors/:id" element={<VendorDetailScreen />} />
             <Route path="/customer/search" element={<SearchResultsScreen />} />
             <Route path="/customer/promotions" element={<PromotionsScreen />} />
-            <Route
-              path="/customer/orders"
-              element={
-                <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">My Orders</h1>
-                </div>
-              }
-            />
+            <Route path="/customer/cart" element={<CartScreen />} />
+            <Route path="/customer/checkout" element={<CheckoutScreen />} />
+            <Route path="/customer/orders" element={<OrdersScreen />} />
+            <Route path="/customer/orders/:id/confirmation" element={<OrderConfirmationScreen />} />
             <Route
               path="/customer/support"
               element={

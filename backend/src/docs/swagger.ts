@@ -219,6 +219,22 @@ const options: swaggerJsdoc.Options = {
         name: 'Promotions',
         description: 'Promotional offers and discounts',
       },
+      {
+        name: 'Cart',
+        description: 'Shopping cart management',
+      },
+      {
+        name: 'Orders',
+        description: 'Order creation and management',
+      },
+      {
+        name: 'Payments',
+        description: 'Payment initiation and status',
+      },
+      {
+        name: 'Addresses',
+        description: 'Customer address management',
+      },
     ],
   },
   apis: ['./src/**/*.ts'],

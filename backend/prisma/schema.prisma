@@ -99,6 +99,7 @@ model CustomerProfile {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   defaultAddress Address? @relation("DefaultAddress", fields: [defaultAddressId], references: [id])
   orders         Order[]  @relation("CustomerOrders")
+  carts          Cart[]
   reviews        Review[]
 
   @@map("customer_profiles")
@@ -123,6 +124,7 @@ model VendorProfile {
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   inventory VendorInventory[]
   orders    Order[]
+  carts     Cart[]
 
   @@index([latitude, longitude])
   @@index([verificationStatus])
@@ -192,6 +194,7 @@ model VendorInventory {
 
   vendor       VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   cylinderType CylinderType  @relation(fields: [cylinderTypeId], references: [id])
+  cartItems    CartItem[]
 
   @@unique([vendorId, cylinderTypeId])
   @@index([vendorId])
@@ -201,26 +204,31 @@ model VendorInventory {
 }
 
 model Order {
-  id                String        @id @default(uuid()) @db.Uuid
-  customerId        String        @map("customer_id") @db.Uuid
-  vendorId          String        @map("vendor_id") @db.Uuid
-  riderId           String?       @map("rider_id") @db.Uuid
-  deliveryAddressId String        @map("delivery_address_id") @db.Uuid
-  subtotal          Decimal       @db.Decimal(10, 2)
-  deliveryFee       Decimal       @default(0) @map("delivery_fee") @db.Decimal(10, 2)
-  total             Decimal       @db.Decimal(10, 2)
-  paymentStatus     PaymentStatus @default(PENDING) @map("payment_status")
-  orderStatus       OrderStatus   @default(PENDING) @map("order_status")
-  createdAt         DateTime      @default(now()) @map("created_at")
+  id                   String        @id @default(uuid()) @db.Uuid
+  orderNumber          String        @unique @map("order_number")
+  customerId           String        @map("customer_id") @db.Uuid
+  vendorId             String        @map("vendor_id") @db.Uuid
+  riderId              String?       @map("rider_id") @db.Uuid
+  deliveryAddressId    String        @map("delivery_address_id") @db.Uuid
+  subtotal             Decimal       @db.Decimal(10, 2)
+  deliveryFee          Decimal       @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  total                Decimal       @db.Decimal(10, 2)
+  paymentMethod        String?       @map("payment_method")
+  paymentStatus        PaymentStatus @default(PENDING) @map("payment_status")
+  orderStatus          OrderStatus   @default(PENDING) @map("order_status")
+  notes                String?       @map("notes")
+  estimatedDeliveryAt  DateTime?     @map("estimated_delivery_at")
+  createdAt            DateTime      @default(now()) @map("created_at")
 
-  customer CustomerProfile @relation("CustomerOrders", fields: [customerId], references: [id])
-  vendor   VendorProfile   @relation(fields: [vendorId], references: [id])
-  rider    RiderProfile?   @relation("RiderOrders", fields: [riderId], references: [id])
-  address  Address         @relation(fields: [deliveryAddressId], references: [id])
-  items    OrderItem[]
-  payment  Payment?
-  delivery Delivery?
-  review   Review?
+  customer        CustomerProfile    @relation("CustomerOrders", fields: [customerId], references: [id])
+  vendor          VendorProfile      @relation(fields: [vendorId], references: [id])
+  rider           RiderProfile?      @relation("RiderOrders", fields: [riderId], references: [id])
+  address         Address            @relation(fields: [deliveryAddressId], references: [id])
+  items           OrderItem[]
+  payment         Payment?
+  delivery        Delivery?
+  review          Review?
+  statusHistory   OrderStatusHistory[]
 
   @@index([customerId])
   @@index([vendorId])
@@ -360,6 +368,54 @@ model Promotion {
 
   @@index([active, startDate, endDate])
   @@map("promotions")
+}
+
+model Cart {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @map("customer_id") @db.Uuid
+  vendorId   String   @map("vendor_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vendor   VendorProfile   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items    CartItem[]
+
+  @@unique([customerId, vendorId])
+  @@index([customerId])
+  @@index([vendorId])
+  @@map("carts")
+}
+
+model CartItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  cartId      String   @map("cart_id") @db.Uuid
+  inventoryId String   @map("inventory_id") @db.Uuid
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  inventory VendorInventory @relation(fields: [inventoryId], references: [id])
+
+  @@unique([cartId, inventoryId])
+  @@index([cartId])
+  @@index([inventoryId])
+  @@map("cart_items")
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(uuid()) @db.Uuid
+  orderId   String      @map("order_id") @db.Uuid
+  status    OrderStatus
+  note      String?
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([createdAt])
+  @@map("order_status_history")
 }
 
 model AuditLog {

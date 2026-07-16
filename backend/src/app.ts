@@ -10,6 +10,10 @@ import { authRouter } from './modules/auth';
 import { vendorRouter } from './modules/vendors';
 import { categoryRouter } from './modules/categories';
 import { promotionRouter } from './modules/promotions';
+import { cartRouter } from './modules/cart';
+import { orderRouter } from './modules/order';
+import { paymentRouter } from './modules/payment';
+import { addressRouter } from './modules/address';
 
 const app = express();
 
@@ -86,6 +90,10 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/vendors', vendorRouter);
 app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/promotions', promotionRouter);
+app.use('/api/v1/cart', cartRouter);
+app.use('/api/v1/orders', orderRouter);
+app.use('/api/v1/payments', paymentRouter);
+app.use('/api/v1/addresses', addressRouter);
 
 // 404 handler
 app.use(notFoundHandler);
