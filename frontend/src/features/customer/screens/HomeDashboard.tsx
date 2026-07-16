@@ -21,8 +21,8 @@ export function HomeDashboard() {
     isLoading: nearbyLoading,
     error: nearbyError,
   } = useNearbyVendors({
-    lat: 6.5244,
-    lng: 3.3792,
+    lat: 5.6037,
+    lng: -0.187,
     limit: 5,
   });
 

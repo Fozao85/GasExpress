@@ -1,54 +1,93 @@
 import { PrismaClient } from '@prisma/client';
+import { seedAdmin } from './admin.seed';
+import { seedCylinders } from './cylinder.seed';
+import { seedCustomers } from './customer.seed';
+import { seedAddresses } from './address.seed';
+import { seedVendors } from './vendor.seed';
+import { seedInventory } from './inventory.seed';
+import { seedRiders } from './rider.seed';
+import { seedPromotions } from './promotion.seed';
+import { seedOrders } from './order.seed';
+import { seedNotifications } from './notification.seed';
 
 const prisma = new PrismaClient();
 
-async function seed(): Promise<void> {
-  console.log('Seeding database...');
+interface CustomerRef {
+  user: { id: string };
+  profileId: string;
+  addresses: { id: string }[];
+}
 
-  // Create cylinder types
-  const cylinders = [
-    { sizeKg: 6, description: '6kg LPG Cylinder' },
-    { sizeKg: 12.5, description: '12.5kg LPG Cylinder' },
-    { sizeKg: 15, description: '15kg LPG Cylinder' },
-    { sizeKg: 50, description: '50kg LPG Cylinder' },
-  ];
+interface VendorRef {
+  user: { id: string };
+  profileId: string;
+}
 
-  for (const cylinder of cylinders) {
-    const existing = await prisma.cylinderType.findFirst({
-      where: { sizeKg: cylinder.sizeKg },
-    });
-    if (!existing) {
-      await prisma.cylinderType.create({
-        data: {
-          sizeKg: cylinder.sizeKg,
-          description: cylinder.description,
-        },
+interface RiderRef {
+  user: { id: string };
+  profileId: string;
+}
+
+async function main() {
+  console.log('\n=== GasNow Development Seed ===\n');
+
+  console.log('[1/10] Admin');
+  await seedAdmin(prisma);
+
+  console.log('[2/10] Cylinder Types');
+  const cylinders = await seedCylinders(prisma);
+
+  console.log('[3/10] Customers');
+  const customerUsers = await seedCustomers(prisma);
+
+  console.log('[4/10] Addresses');
+  const addresses = await seedAddresses(prisma, customerUsers);
+
+  const customers: CustomerRef[] = [];
+  for (const u of customerUsers) {
+    const profile = await prisma.customerProfile.findUnique({ where: { userId: u.id } });
+    if (profile) {
+      customers.push({
+        user: u,
+        profileId: profile.id,
+        addresses: addresses.filter((a) => a.userId === u.id),
       });
     }
   }
 
-  console.log('Cylinder types seeded');
+  console.log('[5/10] Vendors');
+  const vendorResults = (await seedVendors(prisma)) as VendorRef[];
 
-  // Create admin user
-  const adminUser = await prisma.user.upsert({
-    where: { phone: '2340000000000' },
-    update: {},
-    create: {
-      fullName: 'System Admin',
-      phone: '2340000000000',
-      passwordHash: '$2b$10$placeholder-hash-change-in-production',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-    },
+  console.log('[6/10] Inventory');
+  await seedInventory(prisma, vendorResults, cylinders);
+
+  console.log('[7/10] Riders');
+  const riderResults = (await seedRiders(prisma)) as RiderRef[];
+
+  console.log('[8/10] Promotions');
+  await seedPromotions(prisma);
+
+  console.log('[9/10] Orders');
+  await seedOrders(prisma, {
+    customers,
+    vendors: vendorResults,
+    riders: riderResults,
+    cylinders,
   });
 
-  console.log('Admin user seeded:', adminUser.id);
-  console.log('Seeding complete');
+  console.log('[10/10] Notifications');
+  await seedNotifications(prisma, {
+    customers,
+    vendors: vendorResults,
+    riders: riderResults,
+  });
+
+  console.log('\n=== Seed Complete ===\n');
 }
 
-seed()
+main()
   .catch((e) => {
-    console.error('Seed error:', e);
+    console.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {

@@ -10,6 +10,8 @@ export const registerSchema = z.object({
     email: z.string().email().optional(),
     password: z.string().min(8).max(128),
     role: z.nativeEnum(UserRole),
+    businessName: z.string().min(1).max(200).optional(),
+    vehicleType: z.string().max(100).optional(),
   }),
 });
 

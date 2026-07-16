@@ -458,3 +458,432 @@ export async function listPromotions() {
     validUntil: p.endDate.toISOString(),
   }));
 }
+
+async function findVendorByUserId(userId: string) {
+  const vendor = await prisma.vendorProfile.findUnique({
+    where: { userId },
+  });
+  if (!vendor) throw new NotFoundError('Vendor profile');
+  return vendor;
+}
+
+export async function getMyVendorProfile(userId: string) {
+  const vendor = await prisma.vendorProfile.findUnique({
+    where: { userId },
+    include: {
+      user: { select: { fullName: true, email: true } },
+      inventory: {
+        include: { cylinderType: true },
+        orderBy: { price: 'asc' },
+      },
+      _count: { select: { orders: true } },
+    },
+  });
+  if (!vendor) throw new NotFoundError('Vendor profile');
+
+  return {
+    id: vendor.id,
+    businessName: vendor.businessName,
+    ownerName: vendor.user.fullName,
+    email: vendor.user.email,
+    phone: vendor.phone,
+    address: vendor.address,
+    latitude: vendor.latitude ? Number(vendor.latitude) : null,
+    longitude: vendor.longitude ? Number(vendor.longitude) : null,
+    isOpen: vendor.isOpen,
+    openingTime: vendor.openingTime,
+    closingTime: vendor.closingTime,
+    verificationStatus: vendor.verificationStatus,
+    averageRating: vendor.averageRating ? Number(vendor.averageRating) : 0,
+    totalOrders: vendor._count.orders,
+    inventory: vendor.inventory.map((item) => ({
+      id: item.id,
+      cylinderTypeId: item.cylinderTypeId,
+      cylinderSize: Number(item.cylinderType.sizeKg),
+      description: item.cylinderType.description,
+      price: Number(item.price),
+      stockQuantity: item.stockQuantity,
+      inStock: item.stockQuantity > 0,
+    })),
+  };
+}
+
+export async function updateMyVendorProfile(userId: string, data: any) {
+  const vendor = await findVendorByUserId(userId);
+
+  const updated = await prisma.vendorProfile.update({
+    where: { id: vendor.id },
+    data: {
+      ...(data.businessName !== undefined && { businessName: data.businessName }),
+      ...(data.phone !== undefined && { phone: data.phone }),
+      ...(data.address !== undefined && { address: data.address }),
+      ...(data.latitude !== undefined && { latitude: data.latitude }),
+      ...(data.longitude !== undefined && { longitude: data.longitude }),
+      ...(data.isOpen !== undefined && { isOpen: data.isOpen }),
+      ...(data.openingTime !== undefined && { openingTime: data.openingTime }),
+      ...(data.closingTime !== undefined && { closingTime: data.closingTime }),
+    },
+    select: {
+      id: true,
+      businessName: true,
+      phone: true,
+      address: true,
+      latitude: true,
+      longitude: true,
+      isOpen: true,
+      openingTime: true,
+      closingTime: true,
+      verificationStatus: true,
+    },
+  });
+
+  return {
+    ...updated,
+    latitude: updated.latitude ? Number(updated.latitude) : null,
+    longitude: updated.longitude ? Number(updated.longitude) : null,
+  };
+}
+
+export async function getMyInventory(userId: string) {
+  const vendor = await findVendorByUserId(userId);
+
+  const inventory = await prisma.vendorInventory.findMany({
+    where: { vendorId: vendor.id },
+    include: { cylinderType: true },
+    orderBy: { price: 'asc' },
+  });
+
+  return inventory.map((item) => ({
+    id: item.id,
+    cylinderTypeId: item.cylinderTypeId,
+    cylinderSize: Number(item.cylinderType.sizeKg),
+    description: item.cylinderType.description,
+    price: Number(item.price),
+    stockQuantity: item.stockQuantity,
+    inStock: item.stockQuantity > 0,
+  }));
+}
+
+export async function addInventoryItem(userId: string, data: any) {
+  const vendor = await findVendorByUserId(userId);
+
+  const cylinderType = await prisma.cylinderType.findUnique({
+    where: { id: data.cylinderTypeId },
+  });
+  if (!cylinderType) throw new NotFoundError('Cylinder type');
+
+  const existing = await prisma.vendorInventory.findUnique({
+    where: {
+      vendorId_cylinderTypeId: {
+        vendorId: vendor.id,
+        cylinderTypeId: data.cylinderTypeId,
+      },
+    },
+  });
+  if (existing) {
+    const { ValidationError } = await import('../../common/exceptions/app-error');
+    throw new ValidationError([
+      { field: 'cylinderTypeId', message: 'Inventory item already exists for this cylinder type' },
+    ]);
+  }
+
+  const item = await prisma.vendorInventory.create({
+    data: {
+      vendorId: vendor.id,
+      cylinderTypeId: data.cylinderTypeId,
+      stockQuantity: data.stockQuantity,
+      price: data.price,
+    },
+    include: { cylinderType: true },
+  });
+
+  return {
+    id: item.id,
+    cylinderTypeId: item.cylinderTypeId,
+    cylinderSize: Number(item.cylinderType.sizeKg),
+    description: item.cylinderType.description,
+    price: Number(item.price),
+    stockQuantity: item.stockQuantity,
+    inStock: item.stockQuantity > 0,
+  };
+}
+
+export async function updateInventoryItem(userId: string, inventoryId: string, data: any) {
+  const vendor = await findVendorByUserId(userId);
+
+  const item = await prisma.vendorInventory.findFirst({
+    where: { id: inventoryId, vendorId: vendor.id },
+  });
+  if (!item) throw new NotFoundError('Inventory item');
+
+  const updated = await prisma.vendorInventory.update({
+    where: { id: inventoryId },
+    data: {
+      ...(data.stockQuantity !== undefined && { stockQuantity: data.stockQuantity }),
+      ...(data.price !== undefined && { price: data.price }),
+    },
+    include: { cylinderType: true },
+  });
+
+  return {
+    id: updated.id,
+    cylinderTypeId: updated.cylinderTypeId,
+    cylinderSize: Number(updated.cylinderType.sizeKg),
+    description: updated.cylinderType.description,
+    price: Number(updated.price),
+    stockQuantity: updated.stockQuantity,
+    inStock: updated.stockQuantity > 0,
+  };
+}
+
+export async function deleteInventoryItem(userId: string, inventoryId: string) {
+  const vendor = await findVendorByUserId(userId);
+
+  const item = await prisma.vendorInventory.findFirst({
+    where: { id: inventoryId, vendorId: vendor.id },
+  });
+  if (!item) throw new NotFoundError('Inventory item');
+
+  await prisma.vendorInventory.delete({ where: { id: inventoryId } });
+
+  return { id: inventoryId };
+}
+
+export async function getMyOrders(userId: string, query: any) {
+  const vendor = await findVendorByUserId(userId);
+
+  const where: any = { vendorId: vendor.id };
+  if (query.status) {
+    where.orderStatus = query.status;
+  }
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: {
+        customer: {
+          select: {
+            user: { select: { fullName: true, phone: true } },
+          },
+        },
+        items: {
+          include: { cylinderType: true },
+        },
+        address: true,
+        payment: { select: { paymentMethod: true, paymentStatus: true } },
+        statusHistory: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  return {
+    orders: orders.map((order) => ({
+      id: order.id,
+      orderNumber: order.orderNumber,
+      customerName: order.customer.user.fullName,
+      customerPhone: order.customer.user.phone,
+      status: order.orderStatus,
+      paymentMethod: order.payment?.paymentMethod || null,
+      paymentStatus: order.paymentStatus,
+      subtotal: Number(order.subtotal),
+      deliveryFee: Number(order.deliveryFee),
+      total: Number(order.total),
+      notes: order.notes,
+      estimatedDeliveryAt: order.estimatedDeliveryAt?.toISOString() || null,
+      createdAt: order.createdAt.toISOString(),
+      items: order.items.map((item) => ({
+        id: item.id,
+        cylinderSize: Number(item.cylinderType.sizeKg),
+        description: item.cylinderType.description,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+        subtotal: Number(item.subtotal),
+      })),
+      address: {
+        id: order.address.id,
+        addressLine: order.address.addressLine,
+        city: order.address.city,
+        region: order.address.region,
+      },
+      lastStatus: order.statusHistory[0] || null,
+    })),
+    pagination: {
+      page: query.page,
+      limit: query.limit,
+      total,
+      totalPages: Math.ceil(total / query.limit),
+    },
+  };
+}
+
+export async function getVendorOrderById(userId: string, orderId: string) {
+  const vendor = await findVendorByUserId(userId);
+
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, vendorId: vendor.id },
+    include: {
+      customer: {
+        select: {
+          user: { select: { fullName: true, phone: true } },
+        },
+      },
+      items: {
+        include: { cylinderType: true },
+      },
+      address: true,
+      payment: { select: { paymentMethod: true, paymentStatus: true, transactionReference: true } },
+      statusHistory: { orderBy: { createdAt: 'desc' } },
+    },
+  });
+
+  if (!order) throw new NotFoundError('Order');
+
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerName: order.customer.user.fullName,
+    customerPhone: order.customer.user.phone,
+    status: order.orderStatus,
+    paymentMethod: order.payment?.paymentMethod || null,
+    paymentStatus: order.paymentStatus,
+    subtotal: Number(order.subtotal),
+    deliveryFee: Number(order.deliveryFee),
+    total: Number(order.total),
+    notes: order.notes,
+    estimatedDeliveryAt: order.estimatedDeliveryAt?.toISOString() || null,
+    createdAt: order.createdAt.toISOString(),
+    items: order.items.map((item) => ({
+      id: item.id,
+      cylinderSize: Number(item.cylinderType.sizeKg),
+      description: item.cylinderType.description,
+      quantity: item.quantity,
+      unitPrice: Number(item.unitPrice),
+      subtotal: Number(item.subtotal),
+    })),
+    address: {
+      id: order.address.id,
+      addressLine: order.address.addressLine,
+      city: order.address.city,
+      region: order.address.region,
+    },
+    statusHistory: order.statusHistory.map((h) => ({
+      id: h.id,
+      status: h.status,
+      note: h.note,
+      createdAt: h.createdAt.toISOString(),
+    })),
+  };
+}
+
+export async function updateOrderStatus(userId: string, orderId: string, data: any) {
+  const vendor = await findVendorByUserId(userId);
+
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, vendorId: vendor.id },
+  });
+  if (!order) throw new NotFoundError('Order');
+
+  const allowedTransitions: Record<string, string[]> = {
+    PENDING: ['VENDOR_ACCEPTED', 'CANCELLED'],
+    VENDOR_ACCEPTED: ['PREPARING', 'CANCELLED'],
+    PREPARING: ['READY_FOR_PICKUP', 'CANCELLED'],
+  };
+
+  const allowed = allowedTransitions[order.orderStatus];
+  if (!allowed || !allowed.includes(data.status)) {
+    const { ValidationError } = await import('../../common/exceptions/app-error');
+    throw new ValidationError([
+      { field: 'status', message: `Cannot transition from ${order.orderStatus} to ${data.status}` },
+    ]);
+  }
+
+  const [updated] = await prisma.$transaction([
+    prisma.order.update({
+      where: { id: orderId },
+      data: { orderStatus: data.status },
+    }),
+    prisma.orderStatusHistory.create({
+      data: {
+        orderId,
+        status: data.status,
+        note: data.note || null,
+      },
+    }),
+  ]);
+
+  return {
+    id: updated.id,
+    orderNumber: updated.orderNumber,
+    status: updated.orderStatus,
+  };
+}
+
+export async function getDashboard(userId: string) {
+  const vendor = await findVendorByUserId(userId);
+
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const [
+    totalOrders,
+    pendingOrders,
+    activeOrders,
+    completedOrders,
+    todayOrders,
+    totalRevenue,
+    todayRevenue,
+    lowStockItems,
+  ] = await Promise.all([
+    prisma.order.count({ where: { vendorId: vendor.id } }),
+    prisma.order.count({ where: { vendorId: vendor.id, orderStatus: 'PENDING' } }),
+    prisma.order.count({
+      where: {
+        vendorId: vendor.id,
+        orderStatus: { in: ['VENDOR_ACCEPTED', 'PREPARING', 'READY_FOR_PICKUP'] },
+      },
+    }),
+    prisma.order.count({ where: { vendorId: vendor.id, orderStatus: 'DELIVERED' } }),
+    prisma.order.count({
+      where: { vendorId: vendor.id, createdAt: { gte: todayStart } },
+    }),
+    prisma.order.aggregate({
+      where: { vendorId: vendor.id, orderStatus: 'DELIVERED' },
+      _sum: { total: true },
+    }),
+    prisma.order.aggregate({
+      where: { vendorId: vendor.id, orderStatus: 'DELIVERED', createdAt: { gte: todayStart } },
+      _sum: { total: true },
+    }),
+    prisma.vendorInventory.count({
+      where: { vendorId: vendor.id, stockQuantity: { lte: 5 } },
+    }),
+  ]);
+
+  const totalRev = totalRevenue._sum.total ? Number(totalRevenue._sum.total) : 0;
+  const todayRev = todayRevenue._sum.total ? Number(todayRevenue._sum.total) : 0;
+
+  return {
+    stats: {
+      totalOrders,
+      pendingOrders,
+      activeOrders,
+      completedOrders,
+      todayOrders,
+      totalRevenue: totalRev,
+      todayRevenue: todayRev,
+      lowStockItems,
+      averageRating: vendor.averageRating ? Number(vendor.averageRating) : 0,
+    },
+    business: {
+      isOpen: vendor.isOpen,
+      verificationStatus: vendor.verificationStatus,
+    },
+  };
+}

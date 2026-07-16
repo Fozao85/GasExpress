@@ -18,7 +18,7 @@ function validateBody(schema: any, data: any) {
 export async function initiatePayment(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = validateBody(initiatePaymentSchema, { body: req.body });
-    const result = await paymentService.initiatePayment(req.user!.id, body.orderId);
+    const result = await paymentService.initiatePayment(req.user!.sub, body.orderId);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -28,7 +28,7 @@ export async function initiatePayment(req: Request, res: Response, next: NextFun
 export async function getPaymentById(req: Request, res: Response, next: NextFunction) {
   try {
     const { params } = validateBody(paymentIdSchema, { params: req.params });
-    const payment = await paymentService.getPaymentById(req.user!.id, params.id);
+    const payment = await paymentService.getPaymentById(req.user!.sub, params.id);
     res.json({ success: true, data: payment });
   } catch (error) {
     next(error);

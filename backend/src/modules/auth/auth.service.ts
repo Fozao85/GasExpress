@@ -57,6 +57,28 @@ export async function registerUser(input: RegisterInput) {
     },
   });
 
+  if (input.role === 'VENDOR') {
+    await prisma.vendorProfile.create({
+      data: {
+        userId: user.id,
+        businessName: (input as any).businessName || input.fullName,
+        phone: input.phone,
+        address: '',
+        verificationStatus: 'PENDING',
+        isOpen: false,
+      },
+    });
+  }
+
+  if (input.role === 'RIDER') {
+    await prisma.riderProfile.create({
+      data: {
+        userId: user.id,
+        vehicleType: (input as any).vehicleType || null,
+      },
+    });
+  }
+
   const otpCode = await createOtp(user.id, 'VERIFICATION');
 
   return { user, otpCode };

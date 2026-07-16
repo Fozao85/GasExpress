@@ -18,7 +18,7 @@ function validateBody(schema: any, data: any) {
 export async function createOrder(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = validateBody(createOrderSchema, { body: req.body });
-    const order = await orderService.createOrder(req.user!.id, body);
+    const order = await orderService.createOrder(req.user!.sub, body);
     res.status(201).json({ success: true, data: order });
   } catch (error) {
     next(error);
@@ -28,7 +28,7 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
 export async function getOrders(req: Request, res: Response, next: NextFunction) {
   try {
     const { query } = validateBody(listOrdersSchema, { query: req.query });
-    const result = await orderService.getOrders(req.user!.id, query);
+    const result = await orderService.getOrders(req.user!.sub, query);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -38,7 +38,7 @@ export async function getOrders(req: Request, res: Response, next: NextFunction)
 export async function getOrderById(req: Request, res: Response, next: NextFunction) {
   try {
     const { params } = validateBody(orderIdSchema, { params: req.params });
-    const order = await orderService.getOrderById(req.user!.id, params.id);
+    const order = await orderService.getOrderById(req.user!.sub, params.id);
     res.json({ success: true, data: order });
   } catch (error) {
     next(error);
@@ -48,7 +48,7 @@ export async function getOrderById(req: Request, res: Response, next: NextFuncti
 export async function getOrderStatus(req: Request, res: Response, next: NextFunction) {
   try {
     const { params } = validateBody(orderIdSchema, { params: req.params });
-    const history = await orderService.getOrderStatusHistory(req.user!.id, params.id);
+    const history = await orderService.getOrderStatusHistory(req.user!.sub, params.id);
     res.json({ success: true, data: history });
   } catch (error) {
     next(error);
@@ -58,7 +58,7 @@ export async function getOrderStatus(req: Request, res: Response, next: NextFunc
 export async function cancelOrder(req: Request, res: Response, next: NextFunction) {
   try {
     const { params } = validateBody(orderIdSchema, { params: req.params });
-    const order = await orderService.cancelOrder(req.user!.id, params.id);
+    const order = await orderService.cancelOrder(req.user!.sub, params.id);
     res.json({ success: true, data: order });
   } catch (error) {
     next(error);

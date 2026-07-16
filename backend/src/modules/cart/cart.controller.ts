@@ -17,7 +17,7 @@ function validateBody(schema: any, data: any) {
 
 export async function getCart(req: Request, res: Response, next: NextFunction) {
   try {
-    const cart = await cartService.getCart(req.user!.id);
+    const cart = await cartService.getCart(req.user!.sub);
     res.json({ success: true, data: cart });
   } catch (error) {
     next(error);
@@ -27,7 +27,7 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
 export async function addToCart(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = validateBody(addToCartSchema, { body: req.body });
-    const cart = await cartService.addToCart(req.user!.id, body);
+    const cart = await cartService.addToCart(req.user!.sub, body);
     res.status(200).json({ success: true, data: cart });
   } catch (error) {
     next(error);
@@ -41,7 +41,7 @@ export async function updateCartItem(req: Request, res: Response, next: NextFunc
       body: req.body,
     });
     const cart = await cartService.updateCartItemQuantity(
-      req.user!.id,
+      req.user!.sub,
       params.itemId,
       body.quantity
     );
@@ -54,7 +54,7 @@ export async function updateCartItem(req: Request, res: Response, next: NextFunc
 export async function removeCartItem(req: Request, res: Response, next: NextFunction) {
   try {
     const { params } = validateBody(cartItemIdSchema, { params: req.params });
-    const cart = await cartService.removeCartItem(req.user!.id, params.itemId);
+    const cart = await cartService.removeCartItem(req.user!.sub, params.itemId);
     res.json({ success: true, data: cart });
   } catch (error) {
     next(error);
@@ -63,7 +63,7 @@ export async function removeCartItem(req: Request, res: Response, next: NextFunc
 
 export async function clearCart(req: Request, res: Response, next: NextFunction) {
   try {
-    await cartService.clearCart(req.user!.id);
+    await cartService.clearCart(req.user!.sub);
     res.json({ success: true, data: null });
   } catch (error) {
     next(error);

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authenticate, authorize } from '../../common/guards';
 import * as vendorController from './vendors.controller';
 
 export const vendorRouter = Router();
@@ -98,6 +99,48 @@ vendorRouter.get('/nearby', vendorController.getNearbyVendors);
  *         description: Vendor search results with pagination
  */
 vendorRouter.get('/search', vendorController.searchVendors);
+
+// Protected vendor management routes
+vendorRouter.get('/me', authenticate, authorize('VENDOR'), vendorController.getMyProfile);
+vendorRouter.patch('/me', authenticate, authorize('VENDOR'), vendorController.updateMyProfile);
+vendorRouter.get(
+  '/me/inventory',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.getMyInventory
+);
+vendorRouter.post(
+  '/me/inventory',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.addInventoryItem
+);
+vendorRouter.patch(
+  '/me/inventory/:inventoryId',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.updateInventoryItem
+);
+vendorRouter.delete(
+  '/me/inventory/:inventoryId',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.deleteInventoryItem
+);
+vendorRouter.get('/me/orders', authenticate, authorize('VENDOR'), vendorController.getMyOrders);
+vendorRouter.get(
+  '/me/orders/:id',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.getVendorOrderById
+);
+vendorRouter.patch(
+  '/me/orders/:id/status',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.updateOrderStatus
+);
+vendorRouter.get('/me/dashboard', authenticate, authorize('VENDOR'), vendorController.getDashboard);
 
 /**
  * @openapi

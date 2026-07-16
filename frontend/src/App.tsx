@@ -15,10 +15,21 @@ import { VendorLoginScreen } from './features/vendor/screens/LoginScreen';
 import { VendorRegisterScreen } from './features/vendor/screens/RegisterScreen';
 import { VendorOtpScreen } from './features/vendor/screens/OtpScreen';
 import { PendingApprovalScreen } from './features/vendor/screens/PendingApprovalScreen';
+import { VendorDashboardScreen } from './features/vendor/screens/DashboardScreen';
+import { VendorOrdersScreen } from './features/vendor/screens/OrdersScreen';
+import { VendorOrderDetailScreen } from './features/vendor/screens/OrderDetailScreen';
+import { VendorInventoryScreen } from './features/vendor/screens/InventoryScreen';
+import { VendorProfileScreen } from './features/vendor/screens/ProfileScreen';
 
 import { RiderLoginScreen } from './features/rider/screens/LoginScreen';
 import { RiderRegisterScreen } from './features/rider/screens/RegisterScreen';
 import { RiderOtpScreen } from './features/rider/screens/OtpScreen';
+import { RiderDashboardScreen } from './features/rider/screens/DashboardScreen';
+import { AvailableDeliveriesScreen } from './features/rider/screens/AvailableDeliveriesScreen';
+import { ActiveDeliveryScreen } from './features/rider/screens/ActiveDeliveryScreen';
+import { ActiveDeliveryDetailScreen } from './features/rider/screens/ActiveDeliveryDetailScreen';
+import { DeliveryHistoryScreen } from './features/rider/screens/DeliveryHistoryScreen';
+import { RiderProfileScreen } from './features/rider/screens/ProfileScreen';
 
 import { AdminLoginScreen } from './features/admin/screens/LoginScreen';
 
@@ -83,28 +94,23 @@ export function App() {
         {/* Vendor protected routes */}
         <Route element={<ProtectedRoute requiredRole="VENDOR" redirectTo="/vendor/login" />}>
           <Route element={<MainLayout />}>
-            <Route
-              path="/vendor/dashboard"
-              element={
-                <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">Vendor Dashboard</h1>
-                </div>
-              }
-            />
+            <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
+            <Route path="/vendor/orders" element={<VendorOrdersScreen />} />
+            <Route path="/vendor/orders/:id" element={<VendorOrderDetailScreen />} />
+            <Route path="/vendor/inventory" element={<VendorInventoryScreen />} />
+            <Route path="/vendor/profile" element={<VendorProfileScreen />} />
           </Route>
         </Route>
 
         {/* Rider protected routes */}
         <Route element={<ProtectedRoute requiredRole="RIDER" redirectTo="/rider/login" />}>
           <Route element={<MainLayout />}>
-            <Route
-              path="/rider/dashboard"
-              element={
-                <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">Rider Dashboard</h1>
-                </div>
-              }
-            />
+            <Route path="/rider/dashboard" element={<RiderDashboardScreen />} />
+            <Route path="/rider/available" element={<AvailableDeliveriesScreen />} />
+            <Route path="/rider/active" element={<ActiveDeliveryScreen />} />
+            <Route path="/rider/orders/:id" element={<ActiveDeliveryDetailScreen />} />
+            <Route path="/rider/history" element={<DeliveryHistoryScreen />} />
+            <Route path="/rider/profile" element={<RiderProfileScreen />} />
           </Route>
         </Route>
 

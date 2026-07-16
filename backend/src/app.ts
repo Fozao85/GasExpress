@@ -14,6 +14,7 @@ import { cartRouter } from './modules/cart';
 import { orderRouter } from './modules/order';
 import { paymentRouter } from './modules/payment';
 import { addressRouter } from './modules/address';
+import { riderRouter } from './modules/rider';
 
 const app = express();
 
@@ -94,6 +95,7 @@ app.use('/api/v1/cart', cartRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/payments', paymentRouter);
 app.use('/api/v1/addresses', addressRouter);
+app.use('/api/v1/riders', riderRouter);
 
 // 404 handler
 app.use(notFoundHandler);

@@ -17,7 +17,7 @@ function validateBody(schema: any, data: any) {
 
 export async function listAddresses(req: Request, res: Response, next: NextFunction) {
   try {
-    const addresses = await addressService.listAddresses(req.user!.id);
+    const addresses = await addressService.listAddresses(req.user!.sub);
     res.json({ success: true, data: { addresses } });
   } catch (error) {
     next(error);
@@ -27,7 +27,7 @@ export async function listAddresses(req: Request, res: Response, next: NextFunct
 export async function createAddress(req: Request, res: Response, next: NextFunction) {
   try {
     const { body } = validateBody(createAddressSchema, { body: req.body });
-    const address = await addressService.createAddress(req.user!.id, body);
+    const address = await addressService.createAddress(req.user!.sub, body);
     res.status(201).json({ success: true, data: address });
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export async function updateAddress(req: Request, res: Response, next: NextFunct
       params: req.params,
       body: req.body,
     });
-    const address = await addressService.updateAddress(req.user!.id, params.id, body);
+    const address = await addressService.updateAddress(req.user!.sub, params.id, body);
     res.json({ success: true, data: address });
   } catch (error) {
     next(error);
