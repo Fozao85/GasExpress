@@ -321,15 +321,48 @@ export async function searchVendors(query: SearchVendorsQuery) {
 
 export async function listCategories() {
   const categories = await prisma.cylinderType.findMany({
-    orderBy: { sizeKg: 'asc' },
+    orderBy: [{ vendorId: { sort: 'asc', nulls: 'first' } }, { sizeKg: 'asc' }],
   });
 
   return categories.map((c) => ({
     id: c.id,
-    name: `${c.sizeKg}kg`,
+    name: c.name || `${c.sizeKg}kg`,
     sizeKg: Number(c.sizeKg),
     description: c.description,
+    color: c.color,
+    isCustom: !!c.vendorId,
   }));
+}
+
+export async function createCylinderType(
+  userId: string,
+  data: {
+    name: string;
+    sizeKg: number;
+    description?: string | null;
+    color?: string | null;
+  }
+) {
+  const vendor = await findVendorByUserId(userId);
+
+  const cylinderType = await prisma.cylinderType.create({
+    data: {
+      vendorId: vendor.id,
+      name: data.name,
+      sizeKg: data.sizeKg,
+      description: data.description ?? null,
+      color: data.color ?? null,
+    },
+  });
+
+  return {
+    id: cylinderType.id,
+    name: cylinderType.name!,
+    sizeKg: Number(cylinderType.sizeKg),
+    description: cylinderType.description,
+    color: cylinderType.color,
+    isCustom: true,
+  };
 }
 
 export async function getProductsByCategory(categoryId: string) {
@@ -557,6 +590,7 @@ export async function getMyInventory(userId: string) {
     id: item.id,
     cylinderTypeId: item.cylinderTypeId,
     cylinderSize: Number(item.cylinderType.sizeKg),
+    name: item.cylinderType.name,
     description: item.cylinderType.description,
     price: Number(item.price),
     stockQuantity: item.stockQuantity,
@@ -601,6 +635,7 @@ export async function addInventoryItem(userId: string, data: any) {
     id: item.id,
     cylinderTypeId: item.cylinderTypeId,
     cylinderSize: Number(item.cylinderType.sizeKg),
+    name: item.cylinderType.name,
     description: item.cylinderType.description,
     price: Number(item.price),
     stockQuantity: item.stockQuantity,

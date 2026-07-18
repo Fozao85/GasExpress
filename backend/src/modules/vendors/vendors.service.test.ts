@@ -528,7 +528,9 @@ describe('VendorService', () => {
       expect(result[0].name).toBe('6kg');
       expect(result[1].name).toBe('14.5kg');
       expect(prisma.cylinderType.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ orderBy: { sizeKg: 'asc' } })
+        expect.objectContaining({
+          orderBy: [{ vendorId: { sort: 'asc', nulls: 'first' } }, { sizeKg: 'asc' }],
+        })
       );
     });
   });

@@ -122,9 +122,10 @@ model VendorProfile {
   createdAt          DateTime           @default(now()) @map("created_at")
 
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  inventory VendorInventory[]
-  orders    Order[]
-  carts     Cart[]
+  cylinderTypes CylinderType[]
+  inventory     VendorInventory[]
+  orders        Order[]
+  carts         Cart[]
 
   @@index([latitude, longitude])
   @@index([verificationStatus])
@@ -174,13 +175,18 @@ model Address {
 
 model CylinderType {
   id          String  @id @default(uuid()) @db.Uuid
+  vendorId    String? @map("vendor_id") @db.Uuid
+  name        String?
   sizeKg      Decimal @map("size_kg") @db.Decimal(5, 2)
   description String?
+  color       String?
 
-  inventory  VendorInventory[]
-  orderItems OrderItem[]
+  vendor      VendorProfile?  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  inventory   VendorInventory[]
+  orderItems  OrderItem[]
 
   @@index([sizeKg])
+  @@index([vendorId])
   @@map("cylinder_types")
 }
 

@@ -6,6 +6,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { SplashScreen } from './features/customer/screens/SplashScreen';
 import { WelcomeScreen } from './features/customer/screens/WelcomeScreen';
 import { RegisterScreen } from './features/customer/screens/RegisterScreen';
+import { RoleSelectScreen } from './features/customer/screens/RoleSelectScreen';
 import { LoginScreen } from './features/customer/screens/LoginScreen';
 import { OtpScreen } from './features/customer/screens/OtpScreen';
 import { ForgotPasswordScreen } from './features/customer/screens/ForgotPasswordScreen';
@@ -51,6 +52,7 @@ export function App() {
         <Route path="/" element={<SplashScreen />} />
         <Route path="/customer/splash" element={<SplashScreen />} />
         <Route path="/customer/welcome" element={<WelcomeScreen />} />
+        <Route path="/role-select" element={<RoleSelectScreen />} />
         <Route path="/customer/register" element={<RegisterScreen />} />
         <Route path="/customer/login" element={<LoginScreen />} />
         <Route path="/customer/otp" element={<OtpScreen />} />

@@ -6,6 +6,7 @@ interface ProductCardProps {
   price: number;
   inStock: boolean;
   stockQuantity: number;
+  onAddToCart?: (quantity: number) => void;
 }
 
 export function ProductCard({
@@ -14,6 +15,7 @@ export function ProductCard({
   price,
   inStock,
   stockQuantity,
+  onAddToCart,
 }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
 
@@ -29,8 +31,8 @@ export function ProductCard({
         <span className="text-lg font-bold text-primary-600">GHS {price.toFixed(2)}</span>
       </div>
 
-      <div className="flex items-center justify-between">
-        {inStock ? (
+      {inStock ? (
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -50,10 +52,18 @@ export function ProductCard({
               +
             </button>
           </div>
-        ) : (
-          <span className="text-sm text-error-500 font-medium">Out of stock</span>
-        )}
-      </div>
+          {onAddToCart && (
+            <button
+              onClick={() => onAddToCart(quantity)}
+              className="px-4 py-1.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300"
+            >
+              Add to Cart
+            </button>
+          )}
+        </div>
+      ) : (
+        <span className="text-sm text-error-500 font-medium">Out of stock</span>
+      )}
     </div>
   );
 }

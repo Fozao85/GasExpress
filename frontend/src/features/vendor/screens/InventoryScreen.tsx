@@ -7,6 +7,7 @@ import {
   useUpdateInventoryItem,
   useDeleteInventoryItem,
   useCylinderTypes,
+  useCreateCylinderType,
 } from '../../../hooks/useVendor';
 
 export function VendorInventoryScreen() {
@@ -15,17 +16,44 @@ export function VendorInventoryScreen() {
   const addMutation = useAddInventoryItem();
   const updateMutation = useUpdateInventoryItem();
   const deleteMutation = useDeleteInventoryItem();
+  const createTypeMutation = useCreateCylinderType();
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ cylinderTypeId: '', stockQuantity: 0, price: 0 });
   const [editForm, setEditForm] = useState({ stockQuantity: 0, price: 0 });
 
+  const [isCustomType, setIsCustomType] = useState(false);
+  const [customForm, setCustomForm] = useState({ name: '', sizeKg: 0, description: '', color: '' });
+
+  const getItemLabel = (item: {
+    name: string | null;
+    cylinderSize: number;
+    cylinderTypeId: string;
+  }) => {
+    if (item.name) return item.name;
+    const type = cylinderTypes?.find((ct) => ct.id === item.cylinderTypeId);
+    return type?.name || `${item.cylinderSize}kg`;
+  };
+
+  const resetForms = () => {
+    setForm({ cylinderTypeId: '', stockQuantity: 0, price: 0 });
+    setCustomForm({ name: '', sizeKg: 0, description: '', color: '' });
+    setIsCustomType(false);
+    setShowAddForm(false);
+  };
+
   const handleAdd = async () => {
     try {
-      await addMutation.mutateAsync(form);
-      setForm({ cylinderTypeId: '', stockQuantity: 0, price: 0 });
-      setShowAddForm(false);
+      if (isCustomType) {
+        if (!customForm.name || customForm.sizeKg <= 0) return;
+        const newType = await createTypeMutation.mutateAsync(customForm);
+        await addMutation.mutateAsync({ ...form, cylinderTypeId: newType.id });
+      } else {
+        if (!form.cylinderTypeId) return;
+        await addMutation.mutateAsync(form);
+      }
+      resetForms();
     } catch {
       /* handled by mutation error */
     }
@@ -78,19 +106,72 @@ export function VendorInventoryScreen() {
 
       {showAddForm && (
         <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4 space-y-3">
-          <h2 className="font-semibold text-gray-900">New Product</h2>
-          <select
-            value={form.cylinderTypeId}
-            onChange={(e) => setForm({ ...form, cylinderTypeId: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500"
-          >
-            <option value="">Select cylinder type</option>
-            {cylinderTypes?.map((ct) => (
-              <option key={ct.id} value={ct.id}>
-                {ct.name} - {ct.description || ''}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="font-semibold text-gray-900">New Product</h2>
+            <div className="flex bg-gray-100 rounded-lg p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setIsCustomType(false)}
+                className={`px-3 py-1 rounded-md transition-colors ${!isCustomType ? 'bg-white shadow-sm font-medium text-gray-900' : 'text-gray-500'}`}
+              >
+                Existing
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCustomType(true)}
+                className={`px-3 py-1 rounded-md transition-colors ${isCustomType ? 'bg-white shadow-sm font-medium text-gray-900' : 'text-gray-500'}`}
+              >
+                Custom
+              </button>
+            </div>
+          </div>
+
+          {isCustomType ? (
+            <>
+              <Input
+                label="Product Name"
+                value={customForm.name}
+                onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
+                placeholder="e.g. Premium Refill"
+              />
+              <Input
+                label="Size (kg)"
+                type="number"
+                step="0.5"
+                min={0.5}
+                value={customForm.sizeKg || ''}
+                onChange={(e) =>
+                  setCustomForm({ ...customForm, sizeKg: parseFloat(e.target.value) || 0 })
+                }
+              />
+              <Input
+                label="Colour"
+                value={customForm.color}
+                onChange={(e) => setCustomForm({ ...customForm, color: e.target.value })}
+                placeholder="e.g. Red, Blue"
+              />
+              <Input
+                label="Description"
+                value={customForm.description}
+                onChange={(e) => setCustomForm({ ...customForm, description: e.target.value })}
+                placeholder="Brief description"
+              />
+            </>
+          ) : (
+            <select
+              value={form.cylinderTypeId}
+              onChange={(e) => setForm({ ...form, cylinderTypeId: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500"
+            >
+              <option value="">Select cylinder type</option>
+              {cylinderTypes?.map((ct) => (
+                <option key={ct.id} value={ct.id}>
+                  {ct.name} {ct.color ? `(${ct.color})` : ''} - GHS {ct.sizeKg}kg
+                </option>
+              ))}
+            </select>
+          )}
+
           <Input
             label="Stock Quantity"
             type="number"
@@ -107,16 +188,28 @@ export function VendorInventoryScreen() {
             onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
           />
           <div className="flex gap-2">
-            <Button onClick={handleAdd} isLoading={addMutation.isPending}>
+            <Button
+              onClick={handleAdd}
+              isLoading={addMutation.isPending || createTypeMutation.isPending}
+            >
               Save
             </Button>
-            <Button variant="ghost" onClick={() => setShowAddForm(false)}>
+            <Button variant="ghost" onClick={resetForms}>
               Cancel
             </Button>
           </div>
-          {addMutation.error && (
+          {(addMutation.error || createTypeMutation.error) && (
             <div className="p-3 bg-error-50 text-error-700 rounded-lg text-sm" role="alert">
-              {(addMutation.error as any)?.message || 'Failed to add item'}
+              {(addMutation.error || createTypeMutation.error) &&
+              ((addMutation.error || createTypeMutation.error) as any)?.response?.data?.errors
+                ?.length
+                ? ((addMutation.error || createTypeMutation.error) as any).response.data.errors
+                    .map((e: any) => e.message)
+                    .join(', ')
+                : ((addMutation.error || createTypeMutation.error) as any)?.response?.data
+                    ?.message ||
+                  ((addMutation.error || createTypeMutation.error) as any)?.message ||
+                  'Failed to add item'}
             </div>
           )}
         </div>
@@ -140,7 +233,8 @@ export function VendorInventoryScreen() {
             {editingId === item.id ? (
               <div className="space-y-3">
                 <p className="font-medium text-gray-900">
-                  {item.cylinderSize}kg {item.description ? `- ${item.description}` : ''}
+                  {getItemLabel(item)}
+                  {item.description ? ` - ${item.description}` : ''}
                 </p>
                 <Input
                   label="Stock Quantity"
@@ -179,7 +273,8 @@ export function VendorInventoryScreen() {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <p className="font-medium text-gray-900">
-                      {item.cylinderSize}kg {item.description ? `- ${item.description}` : ''}
+                      {getItemLabel(item)}
+                      {item.description ? ` - ${item.description}` : ''}
                     </p>
                     <p className="text-sm text-gray-500 mt-0.5">GHS {item.price.toFixed(2)}</p>
                   </div>

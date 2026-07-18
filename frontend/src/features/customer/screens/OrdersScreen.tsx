@@ -5,20 +5,22 @@ import { LoadingSkeleton, EmptyState } from '../../../components/discovery';
 import { useOrders } from '../../../hooks/useOrder';
 
 const ORDER_STATUSES = [
-  'ALL',
-  'PENDING',
-  'CONFIRMED',
-  'PROCESSING',
-  'OUT_FOR_DELIVERY',
-  'DELIVERED',
-  'CANCELLED',
-] as const;
+  { label: 'All', value: 'ALL' },
+  { label: 'Pending', value: 'PENDING' },
+  { label: 'Processing', value: 'VENDOR_ACCEPTED,PREPARING,READY_FOR_PICKUP' },
+  { label: 'Out for Delivery', value: 'RIDER_ASSIGNED,PICKED_UP,ON_THE_WAY' },
+  { label: 'Delivered', value: 'DELIVERED' },
+  { label: 'Cancelled', value: 'CANCELLED' },
+];
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'bg-amber-100 text-amber-700',
-  CONFIRMED: 'bg-blue-100 text-blue-700',
-  PROCESSING: 'bg-indigo-100 text-indigo-700',
-  OUT_FOR_DELIVERY: 'bg-purple-100 text-purple-700',
+  VENDOR_ACCEPTED: 'bg-blue-100 text-blue-700',
+  PREPARING: 'bg-indigo-100 text-indigo-700',
+  READY_FOR_PICKUP: 'bg-purple-100 text-purple-700',
+  RIDER_ASSIGNED: 'bg-sky-100 text-sky-700',
+  PICKED_UP: 'bg-teal-100 text-teal-700',
+  ON_THE_WAY: 'bg-cyan-100 text-cyan-700',
   DELIVERED: 'bg-success-100 text-success-700',
   CANCELLED: 'bg-error-100 text-error-700',
 };
@@ -28,7 +30,8 @@ export function OrdersScreen() {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const params = statusFilter === 'ALL' ? { page, limit } : { page, limit, status: statusFilter };
+  const statusParam = statusFilter === 'ALL' ? undefined : statusFilter;
+  const params = { page, limit, ...(statusParam ? { status: statusParam } : {}) };
   const { data, isLoading, error } = useOrders(params);
 
   return (
@@ -40,22 +43,22 @@ export function OrdersScreen() {
         role="tablist"
         aria-label="Order status filter"
       >
-        {ORDER_STATUSES.map((status) => (
+        {ORDER_STATUSES.map((tab) => (
           <button
-            key={status}
+            key={tab.value}
             onClick={() => {
-              setStatusFilter(status);
+              setStatusFilter(tab.value);
               setPage(1);
             }}
             className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300 ${
-              statusFilter === status
+              statusFilter === tab.value
                 ? 'bg-primary-500 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
             role="tab"
-            aria-selected={statusFilter === status}
+            aria-selected={statusFilter === tab.value}
           >
-            {status === 'ALL' ? 'All' : status.replace(/_/g, ' ')}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -74,7 +77,7 @@ export function OrdersScreen() {
           message={
             statusFilter === 'ALL'
               ? "You haven't placed any orders yet"
-              : `No orders with status "${statusFilter.replace(/_/g, ' ')}"`
+              : `No orders with status "${ORDER_STATUSES.find((t) => t.value === statusFilter)?.label || statusFilter}"`
           }
           icon="📦"
         />

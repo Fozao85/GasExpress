@@ -25,7 +25,7 @@ export function VendorOtpScreen() {
     setIsLoading(true);
     try {
       await verifyOtp(phone, code, 'VERIFICATION');
-      navigate('/vendor/pending-approval');
+      navigate('/vendor/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid code');
     } finally {

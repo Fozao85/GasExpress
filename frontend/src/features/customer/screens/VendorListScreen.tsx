@@ -25,8 +25,8 @@ export function VendorListScreen() {
     limit: 10,
     sort,
     q: search || undefined,
-    lat: 6.5244,
-    lng: 3.3792,
+    lat: 5.6037,
+    lng: -0.187,
   });
 
   return (

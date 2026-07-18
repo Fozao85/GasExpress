@@ -45,7 +45,7 @@ export function WelcomeScreen() {
       <div className="w-full max-w-xs space-y-3">
         {isLast ? (
           <>
-            <Button fullWidth onClick={() => navigate('/customer/register')}>
+            <Button fullWidth onClick={() => navigate('/role-select')}>
               Create Account
             </Button>
             <Button variant="outline" fullWidth onClick={() => navigate('/customer/login')}>

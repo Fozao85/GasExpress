@@ -46,7 +46,7 @@ export function useVerifyOtpMutation() {
       if (variables.type === 'PASSWORD_RESET') {
         navigate('/customer/reset-password', { state: { phone: variables.phone } });
       } else {
-        navigate('/customer/dashboard');
+        navigate('/customer/login');
       }
     },
   });

@@ -46,6 +46,36 @@ export function OrderConfirmationScreen() {
         </div>
       </div>
 
+      <div className="bg-white rounded-xl border border-gray-100 p-4 mt-4 space-y-3">
+        <h3 className="font-semibold text-gray-900">Order Items</h3>
+        {order.items.map((item) => (
+          <div key={item.id} className="flex justify-between items-center text-sm">
+            <div>
+              <p className="font-medium text-gray-900">{item.cylinderSize}kg Cylinder</p>
+              {item.description && <p className="text-gray-500">{item.description}</p>}
+              <p className="text-gray-400">x{item.quantity}</p>
+            </div>
+            <span className="font-semibold text-gray-900">GHS {item.subtotal.toFixed(2)}</span>
+          </div>
+        ))}
+        <hr className="border-gray-100" />
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Subtotal</span>
+          <span className="text-gray-900">GHS {order.subtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Delivery Fee</span>
+          <span className="text-gray-900">
+            {order.deliveryFee === 0 ? 'Free' : `GHS ${order.deliveryFee.toFixed(2)}`}
+          </span>
+        </div>
+        <hr className="border-gray-100" />
+        <div className="flex justify-between font-semibold">
+          <span className="text-gray-900">Total</span>
+          <span className="text-primary-600">GHS {order.total.toFixed(2)}</span>
+        </div>
+      </div>
+
       {order.payment && (
         <div className="bg-white rounded-xl border border-gray-100 p-4 mt-3 space-y-2">
           <h3 className="font-semibold text-gray-900">Payment</h3>

@@ -141,6 +141,12 @@ vendorRouter.patch(
   vendorController.updateOrderStatus
 );
 vendorRouter.get('/me/dashboard', authenticate, authorize('VENDOR'), vendorController.getDashboard);
+vendorRouter.post(
+  '/me/cylinder-types',
+  authenticate,
+  authorize('VENDOR'),
+  vendorController.createCustomCylinderType
+);
 
 /**
  * @openapi

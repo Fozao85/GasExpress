@@ -208,7 +208,8 @@ export async function getOrders(
 
   const where: any = { customerId: profile.id };
   if (query.status) {
-    where.orderStatus = query.status;
+    const statuses = query.status.split(',').map((s) => s.trim());
+    where.orderStatus = statuses.length === 1 ? statuses[0] : { in: statuses };
   }
 
   const [orders, total] = await Promise.all([

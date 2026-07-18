@@ -7,11 +7,18 @@ import {
   LoadingSkeleton,
 } from '../../../components/discovery';
 import { useVendorDetail } from '../../../hooks/useDiscovery';
+import { useAddToCart } from '../../../hooks/useOrder';
 
 export function VendorDetailScreen() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: vendor, isLoading, error } = useVendorDetail(id);
+  const addToCart = useAddToCart();
+
+  const handleAddToCart = (inventoryId: string, quantity: number) => {
+    if (!vendor) return;
+    addToCart.mutate({ inventoryId, vendorId: vendor.id, quantity });
+  };
 
   if (isLoading)
     return (
@@ -134,6 +141,7 @@ export function VendorDetailScreen() {
               price={p.price}
               inStock={p.inStock}
               stockQuantity={p.stockQuantity}
+              onAddToCart={(quantity) => handleAddToCart(p.id, quantity)}
             />
           ))}
         </div>

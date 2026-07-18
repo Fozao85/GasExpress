@@ -18,6 +18,7 @@ vi.mock('../../../hooks/useVendor', () => ({
   useUpdateInventoryItem: vi.fn(),
   useDeleteInventoryItem: vi.fn(),
   useCylinderTypes: vi.fn(),
+  useCreateCylinderType: vi.fn(),
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -248,6 +249,7 @@ describe('VendorInventoryScreen', () => {
     vi.mocked(useVendor.useAddInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useUpdateInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useDeleteInventoryItem).mockReturnValue(mockMutation as any);
+    vi.mocked(useVendor.useCreateCylinderType).mockReturnValue(mockMutation as any);
     render(<VendorInventoryScreen />, { wrapper: createWrapper() });
     expect(screen.getByRole('status')).toBeDefined();
   });
@@ -266,6 +268,7 @@ describe('VendorInventoryScreen', () => {
     vi.mocked(useVendor.useAddInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useUpdateInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useDeleteInventoryItem).mockReturnValue(mockMutation as any);
+    vi.mocked(useVendor.useCreateCylinderType).mockReturnValue(mockMutation as any);
     render(<VendorInventoryScreen />, { wrapper: createWrapper() });
     expect(screen.getByText('Failed to load inventory.')).toBeDefined();
   });
@@ -284,6 +287,7 @@ describe('VendorInventoryScreen', () => {
     vi.mocked(useVendor.useAddInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useUpdateInventoryItem).mockReturnValue(mockMutation as any);
     vi.mocked(useVendor.useDeleteInventoryItem).mockReturnValue(mockMutation as any);
+    vi.mocked(useVendor.useCreateCylinderType).mockReturnValue(mockMutation as any);
     render(<VendorInventoryScreen />, { wrapper: createWrapper() });
     expect(screen.getByText('No products listed')).toBeDefined();
   });
@@ -310,6 +314,11 @@ describe('VendorInventoryScreen', () => {
       error: null,
     } as any);
     vi.mocked(useVendor.useDeleteInventoryItem).mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+      error: null,
+    } as any);
+    vi.mocked(useVendor.useCreateCylinderType).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
       error: null,

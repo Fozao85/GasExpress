@@ -13,7 +13,11 @@ export function useUpdateVendorProfile() {
   return useMutation({
     mutationFn: (input: Parameters<typeof vendorService.updateVendorProfile>[0]) =>
       vendorService.updateVendorProfile(input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['vendor', 'profile'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['vendor', 'profile'] });
+      qc.invalidateQueries({ queryKey: ['vendor', 'dashboard'] });
+      qc.invalidateQueries({ queryKey: ['vendor', 'inventory'] });
+    },
   });
 }
 
@@ -92,5 +96,14 @@ export function useCylinderTypes() {
   return useQuery({
     queryKey: ['cylinderTypes'],
     queryFn: () => vendorService.listCylinderTypes(),
+  });
+}
+
+export function useCreateCylinderType() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Parameters<typeof vendorService.createCylinderType>[0]) =>
+      vendorService.createCylinderType(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['cylinderTypes'] }),
   });
 }

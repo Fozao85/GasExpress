@@ -22,6 +22,7 @@ export interface InventoryItem {
   id: string;
   cylinderTypeId: string;
   cylinderSize: number;
+  name: string | null;
   description: string | null;
   price: number;
   stockQuantity: number;
@@ -88,6 +89,8 @@ export interface CylinderType {
   name: string;
   sizeKg: number;
   description: string | null;
+  color?: string | null;
+  isCustom?: boolean;
 }
 
 export async function getVendorProfile(): Promise<VendorProfile> {
@@ -165,4 +168,14 @@ export async function getVendorDashboard(): Promise<Dashboard> {
 export async function listCylinderTypes(): Promise<CylinderType[]> {
   const { data } = await api.get('/categories');
   return data.data.categories;
+}
+
+export async function createCylinderType(input: {
+  name: string;
+  sizeKg: number;
+  description?: string;
+  color?: string;
+}): Promise<CylinderType> {
+  const { data } = await api.post('/vendors/me/cylinder-types', input);
+  return data.data;
 }

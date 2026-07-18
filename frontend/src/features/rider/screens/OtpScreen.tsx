@@ -25,7 +25,7 @@ export function RiderOtpScreen() {
     setIsLoading(true);
     try {
       await verifyOtp(phone, code, 'VERIFICATION');
-      navigate('/rider/dashboard');
+      navigate('/rider/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid code');
     } finally {

@@ -53,7 +53,7 @@ export function LoginScreen() {
 
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/customer/register" className="text-primary-500 font-medium hover:underline">
+          <Link to="/role-select" className="text-primary-500 font-medium hover:underline">
             Create one
           </Link>
         </p>

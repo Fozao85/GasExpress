@@ -12,6 +12,7 @@ import {
   inventoryIdSchema,
   updateOrderStatusSchema,
   vendorOrderListSchema,
+  createCylinderTypeSchema,
 } from './vendors.validation';
 import { ValidationError } from '../../common/exceptions/app-error';
 
@@ -83,6 +84,16 @@ export async function listCategories(_req: Request, res: Response, next: NextFun
   try {
     const result = await vendorService.listCategories();
     res.json({ success: true, data: { categories: result } });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createCustomCylinderType(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { body } = validateBody(createCylinderTypeSchema, { body: req.body });
+    const result = await vendorService.createCylinderType(req.user!.sub, body);
+    res.status(201).json({ success: true, data: result });
   } catch (error) {
     next(error);
   }

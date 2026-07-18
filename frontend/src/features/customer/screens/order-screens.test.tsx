@@ -426,8 +426,10 @@ describe('OrdersScreen', () => {
     } as any);
     render(<OrdersScreen />, { wrapper: createWrapper() });
     expect(screen.getByText('All')).toBeInTheDocument();
-    expect(screen.getByText('PENDING')).toBeInTheDocument();
-    expect(screen.getByText('DELIVERED')).toBeInTheDocument();
-    expect(screen.getByText('CANCELLED')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Processing')).toBeInTheDocument();
+    expect(screen.getByText('Out for Delivery')).toBeInTheDocument();
+    expect(screen.getByText('Delivered')).toBeInTheDocument();
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
   });
 });

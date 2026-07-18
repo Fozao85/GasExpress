@@ -106,6 +106,15 @@ export const vendorOrderListSchema = z.object({
   }),
 });
 
+export const createCylinderTypeSchema = z.object({
+  body: z.object({
+    name: z.string().min(1).max(200),
+    sizeKg: z.number().positive(),
+    description: z.string().max(500).optional(),
+    color: z.string().max(50).optional(),
+  }),
+});
+
 export type ListVendorsQuery = z.infer<typeof listVendorsSchema>['query'];
 export type NearbyVendorsQuery = z.infer<typeof nearbyVendorsSchema>['query'];
 export type SearchVendorsQuery = z.infer<typeof searchVendorsSchema>['query'];

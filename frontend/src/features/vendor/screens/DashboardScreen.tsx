@@ -133,6 +133,18 @@ export function VendorDashboardScreen() {
             <span className="text-primary-500 text-sm font-medium">Manage &rarr;</span>
           </div>
         </Link>
+        <Link
+          to="/vendor/profile"
+          className="block bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">Profile</p>
+              <p className="text-sm text-gray-500 mt-0.5">Manage business info &amp; settings</p>
+            </div>
+            <span className="text-primary-500 text-sm font-medium">Edit &rarr;</span>
+          </div>
+        </Link>
       </div>
     </div>
   );

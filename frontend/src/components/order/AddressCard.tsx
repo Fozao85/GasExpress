@@ -9,6 +9,7 @@ interface AddressCardProps {
 export function AddressCard({ address, selected, onSelect }: AddressCardProps) {
   return (
     <button
+      type="button"
       onClick={onSelect}
       className={`w-full text-left p-4 rounded-xl border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300 ${selected ? 'border-primary-500 bg-primary-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}
       aria-pressed={selected}
