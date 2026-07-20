@@ -30,9 +30,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authService
         .getMe()
         .then(setUser)
-        .catch(() => {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+        .catch((error) => {
+          if (error?.response?.status === 401) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+          }
         })
         .finally(() => setIsLoading(false));
     } else {

@@ -424,6 +424,18 @@ model OrderStatusHistory {
   @@map("order_status_history")
 }
 
+model PlatformSettings {
+  id                      String  @id @default(uuid()) @db.Uuid
+  defaultDeliveryFee      Decimal @default(15) @map("default_delivery_fee") @db.Decimal(10, 2)
+  freeDeliveryThreshold   Decimal @default(200) @map("free_delivery_threshold") @db.Decimal(10, 2)
+  supportPhone            String? @map("support_phone")
+  supportEmail            String? @map("support_email")
+  maintenanceMode         Boolean @default(false) @map("maintenance_mode")
+  minimumInventoryAlert   Int     @default(5) @map("minimum_inventory_alert")
+
+  @@map("platform_settings")
+}
+
 model AuditLog {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String?  @map("user_id") @db.Uuid

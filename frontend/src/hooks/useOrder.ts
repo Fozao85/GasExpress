@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as orderService from '../services/order.service';
 
-export function useCart() {
+export function useCart(enabled?: boolean) {
   return useQuery({
     queryKey: ['cart'],
     queryFn: () => orderService.getCart(),
+    enabled: enabled ?? true,
   });
 }
 

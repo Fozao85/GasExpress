@@ -543,6 +543,120 @@ export async function getDeliveryHistory(userId: string, query: any) {
   };
 }
 
+export async function rejectOrder(userId: string, orderId: string) {
+  const rider = await findRiderByUserId(userId);
+
+  const order = await prisma.order.findFirst({
+    where: { id: orderId, riderId: rider.id },
+  });
+  if (!order) throw new NotFoundError('Order');
+  if (order.orderStatus !== 'RIDER_ASSIGNED') {
+    throw new ValidationError([
+      { field: 'orderId', message: 'Can only reject orders in RIDER_ASSIGNED status' },
+    ]);
+  }
+
+  await prisma.$transaction([
+    prisma.order.update({
+      where: { id: orderId },
+      data: { riderId: null, orderStatus: 'READY_FOR_PICKUP' },
+    }),
+    prisma.orderStatusHistory.create({
+      data: { orderId, status: 'READY_FOR_PICKUP', note: 'Rider rejected delivery' },
+    }),
+    prisma.riderProfile.update({
+      where: { id: rider.id },
+      data: { availability: 'ONLINE' },
+    }),
+  ]);
+
+  return { id: order.id, orderNumber: order.orderNumber, status: 'READY_FOR_PICKUP' };
+}
+
+export async function updateLocation(
+  userId: string,
+  data: { latitude: number; longitude: number }
+) {
+  const rider = await findRiderByUserId(userId);
+
+  const updated = await prisma.riderProfile.update({
+    where: { id: rider.id },
+    data: { latitude: data.latitude, longitude: data.longitude },
+    select: { id: true, latitude: true, longitude: true },
+  });
+
+  return {
+    latitude: Number(updated.latitude),
+    longitude: Number(updated.longitude),
+  };
+}
+
+export async function getEarnings(userId: string) {
+  const rider = await findRiderByUserId(userId);
+
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart = new Date(todayStart);
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const baseWhere = { riderId: rider.id, orderStatus: 'DELIVERED' as const };
+
+  const [today, week, month, allTime, history] = await Promise.all([
+    prisma.order.aggregate({
+      where: { ...baseWhere, createdAt: { gte: todayStart } },
+      _sum: { deliveryFee: true },
+      _count: true,
+    }),
+    prisma.order.aggregate({
+      where: { ...baseWhere, createdAt: { gte: weekStart } },
+      _sum: { deliveryFee: true },
+      _count: true,
+    }),
+    prisma.order.aggregate({
+      where: { ...baseWhere, createdAt: { gte: monthStart } },
+      _sum: { deliveryFee: true },
+      _count: true,
+    }),
+    prisma.order.aggregate({
+      where: baseWhere,
+      _sum: { deliveryFee: true },
+      _count: true,
+    }),
+    prisma.order.findMany({
+      where: baseWhere,
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        orderNumber: true,
+        deliveryFee: true,
+        createdAt: true,
+        vendor: { select: { businessName: true } },
+      },
+    }),
+  ]);
+
+  return {
+    periods: {
+      today: { earnings: Number(today._sum.deliveryFee) || 0, deliveries: today._count },
+      week: { earnings: Number(week._sum.deliveryFee) || 0, deliveries: week._count },
+      month: { earnings: Number(month._sum.deliveryFee) || 0, deliveries: month._count },
+      allTime: {
+        earnings: Number(allTime._sum.deliveryFee) || 0,
+        deliveries: allTime._count,
+      },
+    },
+    recentDeliveries: history.map((o) => ({
+      id: o.id,
+      orderNumber: o.orderNumber,
+      vendorName: o.vendor.businessName,
+      amount: Number(o.deliveryFee),
+      completedAt: o.createdAt.toISOString(),
+    })),
+  };
+}
+
 export async function getDashboard(userId: string) {
   const rider = await findRiderByUserId(userId);
 

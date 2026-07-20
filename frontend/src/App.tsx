@@ -30,9 +30,19 @@ import { AvailableDeliveriesScreen } from './features/rider/screens/AvailableDel
 import { ActiveDeliveryScreen } from './features/rider/screens/ActiveDeliveryScreen';
 import { ActiveDeliveryDetailScreen } from './features/rider/screens/ActiveDeliveryDetailScreen';
 import { DeliveryHistoryScreen } from './features/rider/screens/DeliveryHistoryScreen';
+import { RiderEarningsScreen } from './features/rider/screens/EarningsScreen';
+import { RiderPendingApprovalScreen } from './features/rider/screens/PendingApprovalScreen';
 import { RiderProfileScreen } from './features/rider/screens/ProfileScreen';
 
 import { AdminLoginScreen } from './features/admin/screens/LoginScreen';
+import { AdminDashboardScreen } from './features/admin/screens/DashboardScreen';
+import { AdminUsersScreen } from './features/admin/screens/UsersScreen';
+import { AdminVendorsScreen } from './features/admin/screens/VendorsScreen';
+import { AdminRidersScreen } from './features/admin/screens/RidersScreen';
+import { AdminOrdersScreen } from './features/admin/screens/OrdersScreen';
+import { AdminOrderDetailScreen } from './features/admin/screens/OrderDetailScreen';
+import { AdminPromotionsScreen } from './features/admin/screens/PromotionsScreen';
+import { AdminSettingsScreen } from './features/admin/screens/SettingsScreen';
 
 import { HomeDashboard } from './features/customer/screens/HomeDashboard';
 import { VendorListScreen } from './features/customer/screens/VendorListScreen';
@@ -67,6 +77,7 @@ export function App() {
         <Route path="/rider/login" element={<RiderLoginScreen />} />
         <Route path="/rider/register" element={<RiderRegisterScreen />} />
         <Route path="/rider/otp" element={<RiderOtpScreen />} />
+        <Route path="/rider/pending-approval" element={<RiderPendingApprovalScreen />} />
 
         <Route path="/admin/login" element={<AdminLoginScreen />} />
 
@@ -112,6 +123,7 @@ export function App() {
             <Route path="/rider/active" element={<ActiveDeliveryScreen />} />
             <Route path="/rider/orders/:id" element={<ActiveDeliveryDetailScreen />} />
             <Route path="/rider/history" element={<DeliveryHistoryScreen />} />
+            <Route path="/rider/earnings" element={<RiderEarningsScreen />} />
             <Route path="/rider/profile" element={<RiderProfileScreen />} />
           </Route>
         </Route>
@@ -119,14 +131,14 @@ export function App() {
         {/* Admin protected routes */}
         <Route element={<ProtectedRoute requiredRole="ADMIN" redirectTo="/admin/login" />}>
           <Route element={<MainLayout />}>
-            <Route
-              path="/admin/dashboard"
-              element={
-                <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">Admin Dashboard</h1>
-                </div>
-              }
-            />
+            <Route path="/admin/dashboard" element={<AdminDashboardScreen />} />
+            <Route path="/admin/users" element={<AdminUsersScreen />} />
+            <Route path="/admin/vendors" element={<AdminVendorsScreen />} />
+            <Route path="/admin/riders" element={<AdminRidersScreen />} />
+            <Route path="/admin/orders" element={<AdminOrdersScreen />} />
+            <Route path="/admin/orders/:id" element={<AdminOrderDetailScreen />} />
+            <Route path="/admin/promotions" element={<AdminPromotionsScreen />} />
+            <Route path="/admin/settings" element={<AdminSettingsScreen />} />
           </Route>
         </Route>
 

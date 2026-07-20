@@ -6,6 +6,7 @@ import {
   acceptOrderSchema,
   updateDeliveryStatusSchema,
   trackingEventSchema,
+  locationUpdateSchema,
   riderOrderListSchema,
 } from './rider.validation';
 import { ValidationError } from '../../common/exceptions/app-error';
@@ -120,6 +121,35 @@ export async function getDeliveryHistory(req: Request, res: Response, next: Next
     const { query } = validateBody(riderOrderListSchema, { query: req.query });
     const result = await riderService.getDeliveryHistory(req.user!.sub, query);
     res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function rejectOrder(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { params } = validateBody(acceptOrderSchema, { params: req.params });
+    const result = await riderService.rejectOrder(req.user!.sub, params.id);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateLocation(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { body } = validateBody(locationUpdateSchema, { body: req.body });
+    const result = await riderService.updateLocation(req.user!.sub, body);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getEarnings(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await riderService.getEarnings(req.user!.sub);
+    res.json({ success: true, data });
   } catch (error) {
     next(error);
   }

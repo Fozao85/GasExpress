@@ -16,5 +16,8 @@ riderRouter.get('/me/orders', riderController.getMyOrders);
 riderRouter.get('/me/orders/:id', riderController.getOrderById);
 riderRouter.patch('/me/orders/:id/status', riderController.updateDeliveryStatus);
 riderRouter.post('/me/orders/:id/tracking', riderController.submitTracking);
+riderRouter.post('/me/orders/:id/reject', riderController.rejectOrder);
+riderRouter.patch('/me/location', riderController.updateLocation);
+riderRouter.get('/me/earnings', riderController.getEarnings);
 riderRouter.get('/me/history', riderController.getDeliveryHistory);
 riderRouter.get('/me/dashboard', riderController.getDashboard);

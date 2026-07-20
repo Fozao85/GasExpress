@@ -5,7 +5,7 @@ import { useCart } from '../hooks/useOrder';
 export function MainLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { data: cart } = useCart();
+  const { data: cart } = useCart(user?.role === 'CUSTOMER');
   const cartCount = cart?.totalItems ?? 0;
 
   const handleLogout = async () => {

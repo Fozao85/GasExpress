@@ -88,6 +88,20 @@ export function RiderDashboardScreen() {
 
       <div className="space-y-3">
         <Link
+          to="/rider/earnings"
+          className="block bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900">Earnings</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                GHS {stats.todayEarnings.toFixed(2)} today
+              </p>
+            </div>
+            <span className="text-primary-500 text-sm font-medium">View &rarr;</span>
+          </div>
+        </Link>
+        <Link
           to="/rider/available"
           className="block bg-white rounded-xl border border-gray-100 p-4 hover:border-gray-200 transition-colors"
         >

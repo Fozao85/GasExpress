@@ -183,3 +183,39 @@ export async function getRiderDashboard(): Promise<RiderDashboard> {
   const { data } = await api.get('/riders/me/dashboard');
   return data.data;
 }
+
+export async function rejectOrder(
+  orderId: string
+): Promise<{ id: string; orderNumber: string; status: string }> {
+  const { data } = await api.post(`/riders/me/orders/${orderId}/reject`);
+  return data.data;
+}
+
+export async function updateRiderLocation(input: {
+  latitude: number;
+  longitude: number;
+}): Promise<{ latitude: number; longitude: number }> {
+  const { data } = await api.patch('/riders/me/location', input);
+  return data.data;
+}
+
+export interface RiderEarnings {
+  periods: {
+    today: { earnings: number; deliveries: number };
+    week: { earnings: number; deliveries: number };
+    month: { earnings: number; deliveries: number };
+    allTime: { earnings: number; deliveries: number };
+  };
+  recentDeliveries: {
+    id: string;
+    orderNumber: string;
+    vendorName: string;
+    amount: number;
+    completedAt: string;
+  }[];
+}
+
+export async function getRiderEarnings(): Promise<RiderEarnings> {
+  const { data } = await api.get('/riders/me/earnings');
+  return data.data;
+}

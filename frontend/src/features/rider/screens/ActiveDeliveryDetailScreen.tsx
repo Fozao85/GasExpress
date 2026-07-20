@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui';
 import { LoadingSkeleton } from '../../../components/discovery';
-import { useRiderOrder, useUpdateDeliveryStatus } from '../../../hooks/useRider';
+import { useRiderOrder, useUpdateDeliveryStatus, useRejectOrder } from '../../../hooks/useRider';
 
 const STATUS_FLOW: Record<string, { next: string; label: string; color: string }> = {
   RIDER_ASSIGNED: {
@@ -33,6 +33,7 @@ export function ActiveDeliveryDetailScreen() {
   const navigate = useNavigate();
   const { data: order, isLoading, error } = useRiderOrder(id);
   const updateStatus = useUpdateDeliveryStatus();
+  const rejectMutation = useRejectOrder();
 
   if (isLoading) {
     return (
@@ -161,7 +162,7 @@ export function ActiveDeliveryDetailScreen() {
       )}
 
       {flow && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Button
             fullWidth
             className={flow.color}
@@ -170,6 +171,19 @@ export function ActiveDeliveryDetailScreen() {
           >
             {flow.label}
           </Button>
+
+          {order.status === 'RIDER_ASSIGNED' && (
+            <Button
+              fullWidth
+              variant="outline"
+              className="text-error-600 border-error-300 hover:bg-error-50"
+              isLoading={rejectMutation.isPending}
+              onClick={() => rejectMutation.mutate(order.id)}
+            >
+              Reject Delivery
+            </Button>
+          )}
+
           {updateStatus.error && (
             <div className="p-3 bg-error-50 text-error-700 rounded-lg text-sm" role="alert">
               {(updateStatus.error as any)?.message || 'Failed to update status'}

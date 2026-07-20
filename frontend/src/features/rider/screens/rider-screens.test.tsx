@@ -7,6 +7,8 @@ import { RiderDashboardScreen } from './DashboardScreen';
 import { AvailableDeliveriesScreen } from './AvailableDeliveriesScreen';
 import { ActiveDeliveryScreen } from './ActiveDeliveryScreen';
 import { DeliveryHistoryScreen } from './DeliveryHistoryScreen';
+import { RiderEarningsScreen } from './EarningsScreen';
+import { RiderPendingApprovalScreen } from './PendingApprovalScreen';
 import { RiderProfileScreen } from './ProfileScreen';
 
 vi.mock('../../../hooks/useRider', () => ({
@@ -18,6 +20,9 @@ vi.mock('../../../hooks/useRider', () => ({
   useAcceptOrder: vi.fn(),
   useMyOrders: vi.fn(),
   useDeliveryHistory: vi.fn(),
+  useRiderEarnings: vi.fn(),
+  useRejectOrder: vi.fn(),
+  useUpdateRiderLocation: vi.fn(),
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -172,7 +177,7 @@ describe('RiderDashboardScreen', () => {
     expect(screen.getByText('Rider Dashboard')).toBeDefined();
     expect(screen.getByText('Online')).toBeDefined();
     expect(screen.getByText('50')).toBeDefined();
-    expect(screen.getByText(/75\.00/)).toBeDefined();
+    expect(screen.getAllByText(/75\.00/).length).toBe(2);
   });
 });
 
@@ -278,6 +283,84 @@ describe('DeliveryHistoryScreen', () => {
     render(<DeliveryHistoryScreen />, { wrapper: createWrapper() });
     expect(screen.getByText('GN-OLD1')).toBeDefined();
     expect(screen.getByText('Test Gas')).toBeDefined();
+  });
+});
+
+describe('RiderEarningsScreen', () => {
+  it('renders loading skeleton', () => {
+    vi.mocked(useRider.useRiderEarnings).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+    } as any);
+    render(<RiderEarningsScreen />, { wrapper: createWrapper() });
+    expect(screen.getByRole('status')).toBeDefined();
+  });
+
+  it('renders earnings periods', () => {
+    vi.mocked(useRider.useRiderEarnings).mockReturnValue({
+      data: {
+        periods: {
+          today: { earnings: 75, deliveries: 5 },
+          week: { earnings: 300, deliveries: 20 },
+          month: { earnings: 1200, deliveries: 80 },
+          allTime: { earnings: 5000, deliveries: 350 },
+        },
+        recentDeliveries: [
+          {
+            id: 'd1',
+            orderNumber: 'GN-XYZ',
+            vendorName: 'Test Gas',
+            amount: 15,
+            completedAt: '2026-07-18T10:00:00Z',
+          },
+        ],
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+    render(<RiderEarningsScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Today')).toBeDefined();
+    expect(screen.getByText('This Week')).toBeDefined();
+    expect(screen.getByText('This Month')).toBeDefined();
+    expect(screen.getByText('All Time')).toBeDefined();
+    expect(screen.getByText(/75\.00/)).toBeDefined();
+  });
+
+  it('renders empty state when no recent deliveries', () => {
+    vi.mocked(useRider.useRiderEarnings).mockReturnValue({
+      data: {
+        periods: {
+          today: { earnings: 0, deliveries: 0 },
+          week: { earnings: 0, deliveries: 0 },
+          month: { earnings: 0, deliveries: 0 },
+          allTime: { earnings: 0, deliveries: 0 },
+        },
+        recentDeliveries: [],
+      },
+      isLoading: false,
+      error: null,
+    } as any);
+    render(<RiderEarningsScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('No deliveries yet')).toBeDefined();
+  });
+
+  it('renders error state', () => {
+    vi.mocked(useRider.useRiderEarnings).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error('Failed'),
+    } as any);
+    render(<RiderEarningsScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Failed to load earnings data.')).toBeDefined();
+  });
+});
+
+describe('RiderPendingApprovalScreen', () => {
+  it('renders pending approval message', () => {
+    render(<RiderPendingApprovalScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Pending Approval')).toBeDefined();
+    expect(screen.getByText(/under review/)).toBeDefined();
   });
 });
 

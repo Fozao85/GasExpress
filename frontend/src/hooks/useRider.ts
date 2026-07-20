@@ -100,6 +100,32 @@ export function useDeliveryHistory(params?: { page?: number; limit?: number }) {
   });
 }
 
+export function useRejectOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: string) => riderService.rejectOrder(orderId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['rider', 'availableOrders'] });
+      qc.invalidateQueries({ queryKey: ['rider', 'orders'] });
+      qc.invalidateQueries({ queryKey: ['rider', 'dashboard'] });
+    },
+  });
+}
+
+export function useUpdateRiderLocation() {
+  return useMutation({
+    mutationFn: (input: { latitude: number; longitude: number }) =>
+      riderService.updateRiderLocation(input),
+  });
+}
+
+export function useRiderEarnings() {
+  return useQuery({
+    queryKey: ['rider', 'earnings'],
+    queryFn: () => riderService.getRiderEarnings(),
+  });
+}
+
 export function useRiderDashboard() {
   return useQuery({
     queryKey: ['rider', 'dashboard'],
