@@ -18,6 +18,7 @@ import { riderRouter } from './modules/rider';
 import { adminRouter } from './modules/admin';
 import { notificationRouter } from './modules/notifications';
 import { mapsRouter } from './modules/maps';
+import { mediaRouter } from './modules/media';
 import { getIntegrationsHealth } from './integrations';
 
 const app = express();
@@ -111,6 +112,12 @@ app.use('/api/v1/maps', mapsRouter);
 
 // Webhooks (no auth — signature-based)
 app.use('/api/webhooks', webhookRouter);
+
+// Media
+app.use('/api/v1/media', mediaRouter);
+
+// Serve uploaded files
+app.use('/api/v1/media/file', express.static('uploads'));
 
 // Integrations health
 app.get('/api/v1/integrations/status', async (_req, res, next) => {

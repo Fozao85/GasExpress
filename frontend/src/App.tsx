@@ -45,6 +45,7 @@ import { AdminOrdersScreen } from './features/admin/screens/OrdersScreen';
 import { AdminOrderDetailScreen } from './features/admin/screens/OrderDetailScreen';
 import { AdminPromotionsScreen } from './features/admin/screens/PromotionsScreen';
 import { AdminSettingsScreen } from './features/admin/screens/SettingsScreen';
+import { PlatformHealthScreen } from './features/admin/screens/PlatformHealthScreen';
 
 import { HomeDashboard } from './features/customer/screens/HomeDashboard';
 import { VendorListScreen } from './features/customer/screens/VendorListScreen';
@@ -151,6 +152,7 @@ export function App() {
               <Route path="/admin/orders/:id" element={<AdminOrderDetailScreen />} />
               <Route path="/admin/promotions" element={<AdminPromotionsScreen />} />
               <Route path="/admin/settings" element={<AdminSettingsScreen />} />
+              <Route path="/admin/health" element={<PlatformHealthScreen />} />
             </Route>
           </Route>
 

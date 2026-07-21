@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate, authorize } from '../../common/guards';
 import * as adminController from './admin.controller';
+import * as monitoringController from './monitoring.controller';
 
 export const adminRouter = Router();
 
@@ -37,3 +38,15 @@ adminRouter.delete('/promotions/:id', adminController.deletePromotion);
 
 adminRouter.get('/settings', adminController.getSettings);
 adminRouter.patch('/settings', adminController.updateSettings);
+
+// Platform Health & Monitoring
+adminRouter.get('/health', monitoringController.getHealth);
+adminRouter.get('/monitoring/queue', monitoringController.getQueueStats);
+adminRouter.get('/monitoring/queue/failed', monitoringController.getFailedJobs);
+adminRouter.post('/monitoring/queue/retry', monitoringController.retryFailedJobs);
+adminRouter.post('/monitoring/queue/purge', monitoringController.purgeCompletedJobs);
+adminRouter.get('/monitoring/websocket', monitoringController.getWebSocketStats);
+adminRouter.get('/monitoring/payments', monitoringController.getPaymentStats);
+adminRouter.get('/monitoring/maps', monitoringController.getMapsStats);
+adminRouter.get('/monitoring/media', monitoringController.getMediaStats);
+adminRouter.get('/monitoring/workers', monitoringController.getWorkerStatus);

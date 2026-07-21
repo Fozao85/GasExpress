@@ -120,6 +120,7 @@ export function AdminDashboardScreen() {
         <NavCard label="Orders" path="/admin/orders" stats={`${data.totalOrders} total`} />
         <NavCard label="Promotions" path="/admin/promotions" />
         <NavCard label="Settings" path="/admin/settings" />
+        <NavCard label="Platform Health" path="/admin/health" stats="Integration status" />
       </div>
     </div>
   );

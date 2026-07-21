@@ -522,3 +522,22 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+model Media {
+  id         String   @id @default(uuid()) @db.Uuid
+  ownerId    String   @map("owner_id") @db.Uuid
+  ownerType  String   @map("owner_type")
+  mediaType  String   @map("media_type")
+  filename   String
+  originalName String @map("original_name")
+  mimeType   String   @map("mime_type")
+  size       Int
+  path       String
+  thumbnailPath String? @map("thumbnail_path")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([ownerId, ownerType])
+  @@index([ownerType])
+  @@index([mediaType])
+  @@map("media")
+}

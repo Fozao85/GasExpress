@@ -10,6 +10,7 @@ import { AdminRidersScreen } from './RidersScreen';
 import { AdminOrdersScreen } from './OrdersScreen';
 import { AdminPromotionsScreen } from './PromotionsScreen';
 import { AdminSettingsScreen } from './SettingsScreen';
+import { PlatformHealthScreen } from './PlatformHealthScreen';
 
 vi.mock('../../../hooks/useAdmin', () => ({
   useAdminDashboard: vi.fn(),
@@ -33,6 +34,14 @@ vi.mock('../../../hooks/useAdmin', () => ({
   useDeleteAdminPromotion: vi.fn(),
   usePlatformSettings: vi.fn(),
   useUpdatePlatformSettings: vi.fn(),
+  usePlatformHealth: vi.fn(),
+  useQueueStats: vi.fn(),
+  useWebSocketStats: vi.fn(),
+  usePaymentStats: vi.fn(),
+  useMediaStats: vi.fn(),
+  useRetryFailedJobs: vi.fn(),
+  usePurgeCompletedJobs: vi.fn(),
+  useFailedJobs: vi.fn(),
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -41,6 +50,46 @@ vi.mock('../../../contexts/AuthContext', () => ({
 }));
 
 import * as useAdmin from '../../../hooks/useAdmin';
+
+const mockHealthData = {
+  integrations: [
+    { name: 'database', status: 'healthy', latencyMs: 5 },
+    { name: 'redis', status: 'healthy', latencyMs: 2 },
+    { name: 'bullmq', status: 'healthy' },
+  ],
+};
+
+const mockQueueData = {
+  waiting: 3,
+  active: 1,
+  completed: 150,
+  failed: 2,
+  delayed: 0,
+  paused: 0,
+};
+
+const mockWsData = {
+  connectedClients: 12,
+  customers: 5,
+  vendors: 4,
+  riders: 2,
+  admins: 1,
+  activeRooms: 8,
+};
+
+const mockPaymentData = {
+  successful: 100,
+  failed: 5,
+  pending: 10,
+  webhookFailures: 1,
+};
+
+const mockMediaData = {
+  totalUploads: 50,
+  storageUsed: 10000000,
+  uploadsToday: 3,
+  failedUploads: 0,
+};
 
 function createWrapper() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
@@ -356,6 +405,91 @@ describe('AdminPromotionsScreen', () => {
     render(<AdminPromotionsScreen />, { wrapper: createWrapper() });
     expect(screen.getByText('Test Promo')).toBeDefined();
     expect(screen.getByText('10% off')).toBeDefined();
+  });
+});
+
+describe('PlatformHealthScreen', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAdmin.usePlatformHealth).mockReturnValue({
+      data: mockHealthData,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(useAdmin.useQueueStats).mockReturnValue({
+      data: mockQueueData,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(useAdmin.useWebSocketStats).mockReturnValue({
+      data: mockWsData,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(useAdmin.usePaymentStats).mockReturnValue({
+      data: mockPaymentData,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(useAdmin.useMediaStats).mockReturnValue({
+      data: mockMediaData,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(useAdmin.useRetryFailedJobs).mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as any);
+    vi.mocked(useAdmin.usePurgeCompletedJobs).mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
+    } as any);
+  });
+
+  it('renders integration status cards', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Integration Status')).toBeInTheDocument();
+    expect(screen.getByText('Database')).toBeInTheDocument();
+    expect(screen.getByText('Redis')).toBeInTheDocument();
+    expect(screen.getByText('Bullmq')).toBeInTheDocument();
+  });
+
+  it('renders queue statistics', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Background Jobs')).toBeInTheDocument();
+    expect(screen.getByText('Waiting')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Completed')).toBeInTheDocument();
+  });
+
+  it('renders websocket stats', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('WebSocket')).toBeInTheDocument();
+    expect(screen.getByText('Connected Clients')).toBeInTheDocument();
+  });
+
+  it('renders payment stats', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Payments')).toBeInTheDocument();
+    expect(screen.getByText('Successful')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+  });
+
+  it('renders media storage stats', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Media Storage')).toBeInTheDocument();
+    expect(screen.getByText('50')).toBeInTheDocument();
+  });
+
+  it('shows Refresh button', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Refresh')).toBeInTheDocument();
+  });
+
+  it('displays retry and purge buttons', () => {
+    render(<PlatformHealthScreen />, { wrapper: createWrapper() });
+    expect(screen.getByText('Retry Failed')).toBeInTheDocument();
+    expect(screen.getByText('Purge Completed')).toBeInTheDocument();
   });
 });
 
