@@ -1,12 +1,15 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../hooks/useOrder';
+import { useUnreadCount } from '../hooks/useNotifications';
 
 export function MainLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { data: cart } = useCart(user?.role === 'CUSTOMER');
   const cartCount = cart?.totalItems ?? 0;
+  const { data: unreadData } = useUnreadCount();
+  const unreadCount = unreadData?.count ?? 0;
 
   const handleLogout = async () => {
     await logout();
@@ -52,10 +55,35 @@ export function MainLayout() {
                 )}
               </button>
             )}
-            {(user?.role === 'VENDOR' || user?.role === 'RIDER') && (
+            <button
+              onClick={() => navigate('/notifications')}
+              className="relative text-gray-500 hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300 rounded-lg p-1"
+              aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-error-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+            {(user?.role === 'VENDOR' || user?.role === 'RIDER' || user?.role === 'ADMIN') && (
               <button
                 onClick={() =>
-                  navigate(user?.role === 'VENDOR' ? '/vendor/profile' : '/rider/profile')
+                  navigate(
+                    user?.role === 'VENDOR'
+                      ? '/vendor/profile'
+                      : user?.role === 'RIDER'
+                        ? '/rider/profile'
+                        : '/admin/settings'
+                  )
                 }
                 className="text-gray-500 hover:text-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-300 rounded-lg p-1"
                 aria-label="Profile"

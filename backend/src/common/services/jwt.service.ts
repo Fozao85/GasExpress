@@ -1,6 +1,13 @@
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 
+if (!config.jwt.secret || !config.jwt.refreshSecret) {
+  throw new Error(
+    'JWT_SECRET and REFRESH_TOKEN_SECRET environment variables must be set. ' +
+      'Add them to your .env file before starting the server.'
+  );
+}
+
 export interface AccessTokenPayload {
   sub: string;
   role: string;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as addressService from './address.service';
-import { createAddressSchema, updateAddressSchema } from './address.validation';
+import { createAddressSchema, updateAddressSchema, addressIdSchema } from './address.validation';
 import { ValidationError } from '../../common/exceptions/app-error';
 
 function validateBody(schema: any, data: any) {
@@ -42,6 +42,16 @@ export async function updateAddress(req: Request, res: Response, next: NextFunct
     });
     const address = await addressService.updateAddress(req.user!.sub, params.id, body);
     res.json({ success: true, data: address });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteAddress(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { params } = validateBody(addressIdSchema, { params: req.params });
+    const result = await addressService.deleteAddress(req.user!.sub, params.id);
+    res.json({ success: true, data: result });
   } catch (error) {
     next(error);
   }

@@ -82,8 +82,9 @@ model User {
   addresses       Address[]
   otpCodes        OtpCode[]
   refreshTokens   RefreshToken[]
-  notifications   Notification[]
-  auditLogs       AuditLog[]
+  notifications            Notification[]
+  notificationPreferences  NotificationPreference[]
+  auditLogs                AuditLog[]
 
   @@map("users")
 }
@@ -232,6 +233,7 @@ model Order {
   address         Address            @relation(fields: [deliveryAddressId], references: [id])
   items           OrderItem[]
   payment         Payment?
+  paymentTransaction PaymentTransaction?
   delivery        Delivery?
   review          Review?
   statusHistory   OrderStatusHistory[]
@@ -270,6 +272,44 @@ model Payment {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("payments")
+}
+
+model PaymentTransaction {
+  id              String   @id @default(uuid()) @db.Uuid
+  orderId         String   @unique @map("order_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  provider        String
+  amount          Decimal  @db.Decimal(10, 2)
+  currency        String   @default("GHS")
+  status          String   @default("PENDING")
+  reference       String?  @unique
+  providerReference String? @map("provider_reference")
+  phoneNumber     String?  @map("phone_number")
+  metadata        Json?    @map("metadata")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status])
+  @@map("payment_transactions")
+}
+
+model PaymentWebhookLog {
+  id              String   @id @default(uuid()) @db.Uuid
+  provider        String
+  event           String?
+  payload         Json?
+  signature       String?
+  status          String   @default("received")
+  idempotencyKey  String?  @unique @map("idempotency_key")
+  processedAt     DateTime @default(now()) @map("processed_at")
+
+  @@index([provider, status])
+  @@index([idempotencyKey])
+  @@map("payment_webhook_logs")
 }
 
 model Delivery {
@@ -355,12 +395,42 @@ model Notification {
   body             String
   notificationType String   @map("notification_type")
   isRead           Boolean  @default(false) @map("is_read")
+  data             Json?    @map("data")
   createdAt        DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
+  @@index([userId, createdAt])
   @@map("notifications")
+}
+
+model NotificationTemplate {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventType String   @unique @map("event_type")
+  title     String
+  body      String
+  variables String[] @default([])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notification_templates")
+}
+
+model NotificationPreference {
+  id               String  @id @default(uuid()) @db.Uuid
+  userId           String  @map("user_id") @db.Uuid
+  notificationType String  @map("notification_type")
+  inApp            Boolean @default(true) @map("in_app")
+  push             Boolean @default(true)
+  email            Boolean @default(false)
+  sms              Boolean @default(false)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationType])
+  @@map("notification_preferences")
 }
 
 model Promotion {

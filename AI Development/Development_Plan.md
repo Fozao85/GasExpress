@@ -73,11 +73,11 @@ Rider App
       ↓
 Admin Dashboard
       ↓
-Integration
+Platform Integrations
       ↓
-Testing
+Production Readiness & UI Refinement
       ↓
-Deployment
+Deployment & Launch
 ```
 
 ---
@@ -194,29 +194,32 @@ Deliverables
 
 ## Milestone 7
 
-Platform Integration
+Platform Integrations
 
 Deliverables
 
-* Push notifications
-* Payment integration
-* Maps integration
-* Image uploads
-* Background jobs
+* Payment processing (Mobile Money, MTN MoMo, Orange Money)
+* Maps integration (Google Maps / Mapbox)
+* Notifications (in-app, push, SMS, email)
+* Real-time updates (WebSocket / SSE)
+* File uploads
+* Platform services (job queue, rate limiting, logging)
 
 ---
 
 ## Milestone 8
 
-Production Readiness
+Production Readiness & UI Refinement
 
 Deliverables
 
-* Testing
-* Performance optimization
-* Security review
-* Deployment
-* Monitoring
+* UI/UX refinement across all four apps (typography, spacing, colors, animations)
+* Complete visual consistency with the design system
+* Full regression testing and E2E verification
+* Performance optimization (lazy loading, code splitting, bundle optimization)
+* Accessibility audit (WCAG AA)
+* Security audit
+* Code quality improvements (refactoring, dead code removal)
 
 ---
 
@@ -402,47 +405,139 @@ Operational control center.
 
 ---
 
-## Sprint 8 – Integration
+## Sprint 8 – Platform Integrations
 
-Tasks
+### Payments
 
-* Connect all APIs
-* Push notifications
-* Payment gateway
-* Maps
-* File uploads
+Integrate real payment processing:
+* Mobile Money
+* MTN MoMo
+* Orange Money
+* Payment abstraction layer
+* CASH support preserved
+
+### Maps
+
+Integrate Google Maps or Mapbox:
+* Vendor location
+* Customer address picker
+* Rider navigation
+* Distance calculation
+* ETA
+* Route visualization
+
+### Notifications
+
+Implement in-app, push, SMS, and email notifications for:
+* Registration
+* Vendor/Rider approval
+* Order lifecycle (placed, accepted, ready, assigned, delivered, cancelled)
+
+### Real-Time Updates
+
+Replace polling with WebSocket or Server-Sent Events:
+* Live order tracking
+* Vendor dashboard updates
+* Rider dispatch updates
+* Customer order status
+
+### File Uploads
+
+Support vendor logos, rider photos, delivery proof.
+
+### Platform Services
+
+* Central notification service
+* Background job queue
+* Retry handling
+* Rate limiting
+* Improved logging
 
 Deliverable
 
-Complete platform integration.
+Complete platform integrations for production marketplace.
 
 ---
 
-## Sprint 9 – Testing & QA
+## Sprint 9 – Production Readiness & UI Refinement
 
-Tasks
+### Part A – UI/UX Refinement
 
-* Unit testing
-* Integration testing
-* End-to-end testing
-* Bug fixing
-* Performance testing
+Polish every screen to match high-fidelity Figma designs across Customer, Vendor, Rider, and Admin apps:
+* Typography, spacing, colors, shadows, icons
+* Cards, buttons, forms, tables, charts
+* Navigation and responsive layouts
+* Skeleton loaders, empty states, error states, success states
+* Animations, micro-interactions, smooth transitions
+* Complete visual consistency with the design system
+
+### Part B – Quality Assurance
+
+Functional:
+* Full regression testing
+* Manual E2E testing
+* Cross-role workflow verification
+
+Performance:
+* Lazy loading, code splitting, bundle optimization
+* React performance improvements
+* Database query optimization
+
+Accessibility:
+* Keyboard navigation
+* ARIA labels
+* Color contrast
+* Focus management (WCAG AA)
+
+Security:
+* Security audit
+* Authorization review
+* Input validation review
+* Rate limiting verification
+
+Reliability:
+* Error boundaries
+* Offline handling
+* Retry logic
+* Network resilience
+
+Code Quality:
+* Refactoring
+* Dead code and duplication removal
+* Folder organization
+* Documentation
 
 Deliverable
 
-Release candidate.
+Production-ready, polished, and verified release candidate.
 
 ---
 
-## Sprint 10 – Deployment
+## Sprint 10 – Deployment & Launch
 
-Tasks
+### Infrastructure
+* Production Docker configuration
+* Reverse proxy
+* HTTPS
+* Environment configuration
+* Secrets management
 
-* Production deployment
-* Monitoring
-* Logging
-* Analytics
-* Backup strategy
+### CI/CD
+* Automatic build, lint, test, and deploy from GitHub
+
+### Monitoring
+* Logging, error monitoring, health checks, metrics
+
+### Database
+* Production PostgreSQL
+* Backups and restore strategy
+* Connection pooling
+
+### Final Verification
+* Smoke testing
+* Production sanity checks
+* Release checklist
+* Version tagging
 
 Deliverable
 
@@ -459,28 +554,35 @@ Database
 Authentication
      │
      ▼
-Users
+Users / Roles
+     │
+     ├────────────────────┐
+     ▼                    ▼
+Vendors               Riders
+     │                    │
+     ▼                    │
+Products                 │
+     │                    │
+     ▼                    │
+Orders ──────────────────┤
+     │                    │
+     ▼                    ▼
+Tracking / Real-Time
      │
      ▼
-Vendors
+Payments
      │
      ▼
-Products
+Notifications (in-app, push, SMS, email)
      │
      ▼
-Orders
+Maps / Geocoding
      │
      ▼
-Riders
+File Uploads
      │
      ▼
-Tracking
-     │
-     ▼
-Notifications
-     │
-     ▼
-Reports
+Platform Services (job queue, rate limiting, logging)
 ```
 
 ---
@@ -523,7 +625,7 @@ Every feature must:
 | Inconsistent AI-generated code | Always use the AI Implementation Guide and project context.                                       |
 | API changes                    | Update API Contracts before implementation.                                                       |
 | Design inconsistencies         | Enforce the Design System and Component Library.                                                  |
-| Integration issues             | Integrate continuously at the end of each sprint instead of waiting until the end of the project. |
+| Integration issues             | Integrate continuously during Sprint 08 with a dedicated platform services layer. |
 
 ---
 
@@ -546,32 +648,41 @@ For every sprint:
 
 ### Backend
 
-* Production-ready REST API
-* PostgreSQL database
-* Authentication service
+* Production-ready REST API with platform integrations
+* PostgreSQL database with backup/recovery
+* Authentication and authorization service
+* Payment processing (Mobile Money, MTN MoMo, Orange Money)
+* Maps and geocoding service
+* Notification service (in-app, push, SMS, email)
+* Real-time updates (WebSocket / SSE)
+* File upload service
+* Background job queue with retry
+* Rate limiting and logging infrastructure
 * Documentation
 
 ### Frontend
 
-* Customer App
-* Vendor App
-* Rider App
-* Admin Dashboard
+* Customer App (polished UI)
+* Vendor App (polished UI)
+* Rider App (polished UI)
+* Admin Dashboard (polished UI)
 
 ### Infrastructure
 
-* CI/CD pipeline
-* Monitoring
-* Logging
-* Deployment configuration
+* CI/CD pipeline (build → test → deploy)
+* Docker production configuration
+* Reverse proxy with HTTPS
+* Monitoring, error tracking, and alerting
+* Logging and metrics
+* Secrets management
 
 ### Documentation
 
-* API Documentation
+* API Documentation (Swagger/OpenAPI)
 * Technical Specification
-* Developer Handoff
-* User Guides
 * Deployment Guide
+* Runbook and Rollback Plan
+* Release Notes
 
 ---
 

@@ -9,6 +9,7 @@ import { seedRiders } from './rider.seed';
 import { seedPromotions } from './promotion.seed';
 import { seedOrders } from './order.seed';
 import { seedNotifications } from './notification.seed';
+import { seedPlatformSettings } from './platform-settings.seed';
 
 const prisma = new PrismaClient();
 
@@ -31,16 +32,19 @@ interface RiderRef {
 async function main() {
   console.log('\n=== GasNow Development Seed ===\n');
 
-  console.log('[1/10] Admin');
+  console.log('[0/11] Platform Settings');
+  await seedPlatformSettings(prisma);
+
+  console.log('[1/11] Admin');
   await seedAdmin(prisma);
 
-  console.log('[2/10] Cylinder Types');
+  console.log('[2/11] Cylinder Types');
   const cylinders = await seedCylinders(prisma);
 
-  console.log('[3/10] Customers');
+  console.log('[3/11] Customers');
   const customerUsers = await seedCustomers(prisma);
 
-  console.log('[4/10] Addresses');
+  console.log('[4/11] Addresses');
   const addresses = await seedAddresses(prisma, customerUsers);
 
   const customers: CustomerRef[] = [];
@@ -55,19 +59,19 @@ async function main() {
     }
   }
 
-  console.log('[5/10] Vendors');
+  console.log('[5/11] Vendors');
   const vendorResults = (await seedVendors(prisma)) as VendorRef[];
 
-  console.log('[6/10] Inventory');
+  console.log('[6/11] Inventory');
   await seedInventory(prisma, vendorResults, cylinders);
 
-  console.log('[7/10] Riders');
+  console.log('[7/11] Riders');
   const riderResults = (await seedRiders(prisma)) as RiderRef[];
 
-  console.log('[8/10] Promotions');
+  console.log('[8/11] Promotions');
   await seedPromotions(prisma);
 
-  console.log('[9/10] Orders');
+  console.log('[9/11] Orders');
   await seedOrders(prisma, {
     customers,
     vendors: vendorResults,
@@ -75,7 +79,7 @@ async function main() {
     cylinders,
   });
 
-  console.log('[10/10] Notifications');
+  console.log('[10/11] Notifications');
   await seedNotifications(prisma, {
     customers,
     vendors: vendorResults,

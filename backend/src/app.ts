@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
-import { errorHandler, requestLogger, notFoundHandler } from './common/middleware';
+import { errorHandler, requestLogger, notFoundHandler, correlationId } from './common/middleware';
 import { swaggerSpec } from './docs/swagger';
 import { authRouter } from './modules/auth';
 import { vendorRouter } from './modules/vendors';
@@ -12,10 +12,13 @@ import { categoryRouter } from './modules/categories';
 import { promotionRouter } from './modules/promotions';
 import { cartRouter } from './modules/cart';
 import { orderRouter } from './modules/order';
-import { paymentRouter } from './modules/payment';
+import { paymentRouter, webhookRouter } from './modules/payment';
 import { addressRouter } from './modules/address';
 import { riderRouter } from './modules/rider';
 import { adminRouter } from './modules/admin';
+import { notificationRouter } from './modules/notifications';
+import { mapsRouter } from './modules/maps';
+import { getIntegrationsHealth } from './integrations';
 
 const app = express();
 
@@ -27,6 +30,9 @@ app.use(
     credentials: true,
   })
 );
+
+// Correlation ID
+app.use(correlationId);
 
 // Rate limiting
 app.use(
@@ -98,6 +104,23 @@ app.use('/api/v1/payments', paymentRouter);
 app.use('/api/v1/addresses', addressRouter);
 app.use('/api/v1/riders', riderRouter);
 app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/notifications', notificationRouter);
+
+// Maps
+app.use('/api/v1/maps', mapsRouter);
+
+// Webhooks (no auth — signature-based)
+app.use('/api/webhooks', webhookRouter);
+
+// Integrations health
+app.get('/api/v1/integrations/status', async (_req, res, next) => {
+  try {
+    const health = await getIntegrationsHealth();
+    res.json({ success: true, data: { services: health } });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // 404 handler
 app.use(notFoundHandler);

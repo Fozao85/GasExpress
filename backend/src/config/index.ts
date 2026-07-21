@@ -12,9 +12,9 @@ export const config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'change-me',
+    secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '15m',
-    refreshSecret: process.env.REFRESH_TOKEN_SECRET || 'change-me-refresh',
+    refreshSecret: process.env.REFRESH_TOKEN_SECRET,
     refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
   },
 
@@ -25,6 +25,12 @@ export const config = {
 
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  },
+
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || null,
   },
 
   upload: {

@@ -7,6 +7,7 @@ import {
   LoadingSkeleton,
 } from '../../../components/discovery';
 import { useVendors } from '../../../hooks/useDiscovery';
+import { useGeolocation } from '../../../hooks/useGeolocation';
 
 const SORT_OPTIONS = [
   { key: 'distance' as const, label: 'Nearest' },
@@ -20,13 +21,16 @@ export function VendorListScreen() {
   const [sort, setSort] = useState<'distance' | 'speed' | 'rating' | 'price'>('distance');
   const [page, setPage] = useState(1);
 
+  const { latitude, longitude } = useGeolocation();
+  const coords =
+    latitude && longitude ? { lat: latitude, lng: longitude } : { lat: 5.6037, lng: -0.187 };
+
   const { data, isLoading, error } = useVendors({
     page,
     limit: 10,
     sort,
     q: search || undefined,
-    lat: 5.6037,
-    lng: -0.187,
+    ...coords,
   });
 
   return (

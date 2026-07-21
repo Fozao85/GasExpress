@@ -1,33 +1,60 @@
-# Frontend — Testing
+# Frontend — UI/UX Refinement
 
-## Unit & Integration
-- [ ] Component unit tests (Vitest + Testing Library)
-- [ ] Screen integration tests
+## Part A — UI Polish (All 4 Apps)
 
-## E2E
-- [ ] E2E tests for critical flows (auth, order, tracking, vendor order mgmt, rider delivery)
+### Customer App
+- [ ] Home screen: skeleton loaders, empty states, polished vendor cards
+- [ ] Search: loading, empty results, error states, smooth filtering
+- [ ] Vendor Details: photo gallery, polished info layout, inventory list
+- [ ] Cart: item list, quantity controls, fee breakdown, empty cart state
+- [ ] Checkout: address selector, payment method picker, order summary
+- [ ] Tracking: real-time map, status timeline, ETA, rider info card
+- [ ] Order History: list with status badges, empty state
+- [ ] Profile: settings, address management, polished form inputs
 
-## Cross-browser
-- [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
+### Vendor App
+- [ ] Dashboard: stat cards, recent orders, revenue summary
+- [ ] Orders: incoming/active/completed tabs, status badges, empty states
+- [ ] Inventory: product list, add/edit forms, stock indicators, empty state
+- [ ] Revenue: chart, period selector, transaction list
+- [ ] Settings: business profile form, upload logo
 
-## Responsive
-- [ ] Mobile responsiveness audit
+### Rider App
+- [ ] Dashboard: availability toggle, quick stats
+- [ ] Jobs: available/active/completed tabs, dispatch cards
+- [ ] Earnings: period breakdown, chart, transaction list
+- [ ] History: delivery list with status badges
+- [ ] Pending Approval: status indicator, loading state
 
-## Accessibility
-- [ ] Accessibility audit (keyboard nav, screen reader, contrast, focus management)
-- [ ] WCAG AA compliance check
+### Admin Dashboard
+- [ ] Dashboard: stat cards, revenue chart, order distribution, ratings
+- [ ] Users: search, filters, pagination, action modals
+- [ ] Vendors: approval cards, empty state
+- [ ] Riders: approval cards, empty state
+- [ ] Orders: search, filters, status badges, detail timeline
+- [ ] Promotions: create/edit form, active/inactive toggle, list
+- [ ] Settings: form inputs, save confirmation
 
-## Performance
-- [ ] Performance audit (Lighthouse ≥ 90)
-- [ ] LCP < 2.5s, TTI < 3s
+### Design System Consistency
+- [ ] Typography: correct font families, sizes, weights, line heights everywhere
+- [ ] Spacing: consistent padding, margins, gaps across all components
+- [ ] Colors: brand palette applied correctly (primary, secondary, accent, status)
+- [ ] Shadows: card elevation, modal depth, consistent drop shadows
+- [ ] Icons: consistent style (outline vs filled), sizing, alignment
+- [ ] Cards: uniform border-radius, padding, hover effects
+- [ ] Buttons: consistent sizes, colors, hover/active/focus states
+- [ ] Forms: consistent input styling, labels, validation messages
+- [ ] Tables: consistent header, row, pagination styling
+- [ ] Charts: consistent colors, axis labels, tooltips
+- [ ] Navigation: uniform header, bottom nav (mobile), sidebar (desktop)
+- [ ] Responsive: mobile, tablet, desktop layouts verified on all screens
 
-## Offline
-- [ ] Offline mode rendering
-- [ ] Poor network simulation
-- [ ] Retry after reconnect
-- [ ] Cached data rendering
-
-## Notifications
-- [ ] Push permission denied flow
-- [ ] Deep link navigation from notification
-- [ ] Background notification handling
+### Animations & Transitions
+- [ ] Skeleton loaders on all data-fetching screens
+- [ ] Page transitions (route change animations)
+- [ ] Button hover/active micro-interactions
+- [ ] Card hover elevation change
+- [ ] Modal/drawer open/close transitions
+- [ ] Status badge color transitions
+- [ ] Notification badge appearance animation
+- [ ] Form input focus ring animation

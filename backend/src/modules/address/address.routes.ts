@@ -80,3 +80,23 @@ addressRouter.get('/', addressController.listAddresses);
  *         description: Address not found
  */
 addressRouter.put('/:id', addressController.updateAddress);
+
+/**
+ * @openapi
+ * /addresses/{id}:
+ *   delete:
+ *     tags: [Addresses]
+ *     summary: Delete an address
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     responses:
+ *       200:
+ *         description: Address deleted
+ *       404:
+ *         description: Address not found
+ */
+addressRouter.delete('/:id', addressController.deleteAddress);

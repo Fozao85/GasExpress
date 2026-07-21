@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Input } from '../../../components/ui';
 import { LoadingSkeleton } from '../../../components/discovery';
 import { AddressCard, PaymentCard, OrderSummary } from '../../../components/order';
+import { AddressPicker } from '../../../components/checkout/AddressPicker';
 import { useCart, useAddresses, useCreateOrder, useCreateAddress } from '../../../hooks/useOrder';
 
 export function CheckoutScreen() {
@@ -21,6 +22,8 @@ export function CheckoutScreen() {
     addressLine: '',
     city: '',
     region: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
   });
 
   if (cartLoading || addrLoading) return <LoadingSkeleton count={3} />;
@@ -50,7 +53,11 @@ export function CheckoutScreen() {
       { addressId: effectiveAddress, paymentMethod, notes: notes.trim() || undefined },
       {
         onSuccess: (order) => {
-          navigate(`/customer/orders/${order.id}/confirmation`, { replace: true });
+          if (paymentMethod === 'MOBILE_MONEY') {
+            navigate(`/customer/payment/${order.id}`, { replace: true });
+          } else {
+            navigate(`/customer/orders/${order.id}/confirmation`, { replace: true });
+          }
         },
       }
     );
@@ -85,11 +92,15 @@ export function CheckoutScreen() {
                 value={newAddress.label}
                 onChange={(e) => setNewAddress((p) => ({ ...p, label: e.target.value }))}
               />
-              <Input
-                label="Address Line"
-                required
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address Line <span className="text-error-500">*</span>
+              </label>
+              <AddressPicker
                 value={newAddress.addressLine}
-                onChange={(e) => setNewAddress((p) => ({ ...p, addressLine: e.target.value }))}
+                placeholder="Search for your delivery address..."
+                onChange={(addressLine, lat, lng) =>
+                  setNewAddress((p) => ({ ...p, addressLine, latitude: lat, longitude: lng }))
+                }
               />
               <div className="flex gap-2">
                 <Input

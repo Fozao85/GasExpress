@@ -1,14 +1,21 @@
+import http from 'http';
 import { app } from './app';
 import { config } from './config';
 import { prisma } from './database';
 import { logger } from './common/middleware';
+import { initializeSocket } from './websocket';
+import { startNotificationWorker } from './queue';
 
 async function main(): Promise<void> {
   try {
     await prisma.$connect();
     logger.info('Connected to PostgreSQL');
 
-    app.listen(config.port, () => {
+    const httpServer = http.createServer(app);
+    initializeSocket(httpServer);
+    startNotificationWorker();
+
+    httpServer.listen(config.port, () => {
       logger.info(`GasNow API running on port ${config.port}`);
       logger.info(`Environment: ${config.env}`);
       logger.info(`Health check: http://localhost:${config.port}/api/v1/health`);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { SearchBar, VendorCard, LoadingSkeleton, EmptyState } from '../../../components/discovery';
 import { useNearbyVendors, usePromotions } from '../../../hooks/useDiscovery';
+import { useGeolocation } from '../../../hooks/useGeolocation';
 
 const QUICK_ACTIONS = [
   { label: 'Order Gas', icon: '🛢️', path: '/customer/vendors' },
@@ -16,13 +17,16 @@ export function HomeDashboard() {
   const { user } = useAuth();
   const [search, setSearch] = useState('');
 
+  const { latitude, longitude } = useGeolocation();
+  const coords =
+    latitude && longitude ? { lat: latitude, lng: longitude } : { lat: 5.6037, lng: -0.187 };
+
   const {
     data: nearbyData,
     isLoading: nearbyLoading,
     error: nearbyError,
   } = useNearbyVendors({
-    lat: 5.6037,
-    lng: -0.187,
+    ...coords,
     limit: 5,
   });
 

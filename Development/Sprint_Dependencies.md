@@ -35,11 +35,11 @@ Sprint 07                                             │││
     │                                                 │││
     ▼                                                 ▼▼▼
 Sprint 08 ──────────────────────────────────────────────┘
-  Integration
+  Platform Integrations
     │
     ▼
 Sprint 09
-  Testing & QA
+  Production Readiness & UI Refinement
     │
     ▼
 Sprint 10
@@ -80,12 +80,12 @@ Required by: Sprint 04 (riders enable tracking), Sprint 07 (admin manages riders
 Depends on: Sprints 01–06 (all user roles and data)
 Required by: Sprint 08 (admin monitoring of integrations)
 
-### Sprint 08 — Integration
+### Sprint 08 — Platform Integrations
 Depends on: Sprints 00–07 (connects all existing services)
-Required by: Sprint 09 (integration must work before testing)
+Required by: Sprint 09 (integrations must work before UI refinement)
 
-### Sprint 09 — Testing & QA
-Depends on: Sprint 08 (integrated system to test)
+### Sprint 09 — Production Readiness & UI Refinement
+Depends on: Sprint 08 (polished UI needs integrated platform)
 Required by: Sprint 10 (must pass QA before deployment)
 
 ### Sprint 10 — Deployment & Launch
@@ -101,4 +101,5 @@ Required by: Production
 
 ## Risk Notes
 - Sprint 04 (Tracking) depends on Sprint 06 (Rider) — circular dependency risk. Recommendation: implement rider assignment as a stub/contract in Sprint 04, full implementation in Sprint 06.
-- Sprint 08 (Integration) should not start until Sprints 00–07 are stable.
+- Sprint 08 (Platform Integrations) should not start until Sprints 00–07 are stable.
+- Sprint 09 Part A (UI/UX) and Part B (QA) can be partially parallelized but UI refinement depends on having the integrated platform from Sprint 08.

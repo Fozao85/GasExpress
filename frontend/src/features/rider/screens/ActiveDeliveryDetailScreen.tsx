@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui';
 import { LoadingSkeleton } from '../../../components/discovery';
+import { RiderNavigation } from '../../../components/rider/RiderNavigation';
 import { useRiderOrder, useUpdateDeliveryStatus, useRejectOrder } from '../../../hooks/useRider';
 
 const STATUS_FLOW: Record<string, { next: string; label: string; color: string }> = {
@@ -80,6 +81,23 @@ export function ActiveDeliveryDetailScreen() {
           {order.status.replace(/_/g, ' ')}
         </span>
       </div>
+
+      {/* Navigation / Map */}
+      {order.vendorLatitude &&
+        order.vendorLongitude &&
+        order.deliveryAddress.latitude &&
+        order.deliveryAddress.longitude && (
+          <div className="mb-4">
+            <RiderNavigation
+              pickupLat={Number(order.vendorLatitude)}
+              pickupLng={Number(order.vendorLongitude)}
+              dropoffLat={Number(order.deliveryAddress.latitude)}
+              dropoffLng={Number(order.deliveryAddress.longitude)}
+              pickupAddress={order.vendorAddress}
+              dropoffAddress={order.deliveryAddress.addressLine}
+            />
+          </div>
+        )}
 
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4">
         <h2 className="font-semibold text-gray-900 mb-2">Pickup from Vendor</h2>

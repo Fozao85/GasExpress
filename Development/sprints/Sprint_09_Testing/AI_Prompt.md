@@ -2,11 +2,14 @@
 
 ## Role
 
-You are a senior QA engineer responsible for validating the GasNow platform.
+You are a senior UI/UX and QA engineer responsible for polishing the GasNow platform and verifying production readiness.
 
 Read:
 
 - AI_Implementation_Guide.md
+- Design System
+- Component Library
+- High-Fidelity Designs (Figma)
 - Sprint_09.md
 - Performance_Checklist.md
 - Security_Checklist.md
@@ -16,102 +19,80 @@ Read:
 
 # Objective
 
-Perform complete quality assurance before production release. Verify functionality, reliability, security, accessibility, and performance meet all targets.
+Transform the existing marketplace into a polished, deployable production application. No new marketplace features.
 
 ---
 
-# Testing Tasks
+# Part A — UI/UX Refinement
 
-## Backend Testing
+Polish every screen across Customer, Vendor, Rider, and Admin apps to match the approved high-fidelity Figma designs.
 
-Implement:
+## Design System Consistency
 
-- Unit tests (all services, controllers, utilities)
-- API integration tests (all endpoints, success + error)
-- Authentication & authorization tests (JWT, RBAC, rate limiting)
-- Database query performance tests (N+1, index usage)
-- WebSocket connection and reconnection tests
-- Queue worker tests (retry, recovery, dead letter queue)
-- Payment flow tests (initiate, webhook, dedup, timeout)
-- Notification delivery tests (push, email, SMS)
-- File upload tests (type, size, corruption)
+Apply correct:
 
----
+- Typography (font families, sizes, weights, line heights)
+- Spacing (padding, margins, gaps)
+- Colors (brand palette)
+- Shadows (card elevation, modal depth)
+- Icons (consistent style and sizing)
 
-## Frontend Testing
+## Component Polish
 
-Implement:
+Refine:
 
-- Component unit tests (Vitest + Testing Library)
-- Screen integration tests
-- E2E tests for all critical user flows
-- Offline mode and network recovery tests
-- Notification permission and deep link tests
-- Accessibility audit (WCAG AA)
+- Cards, Buttons, Forms, Tables, Charts
+- Navigation (header, bottom nav, sidebar)
+- Responsive layouts (mobile, tablet, desktop)
+- Skeleton loaders, empty states, error states, success states
+- Animations, micro-interactions, smooth transitions
 
 ---
 
-## End-to-End Testing
+# Part B — Quality Assurance
 
-Test all roles:
+## Functional Testing
 
-Customer flow:
+- Full regression: all existing tests must still pass
+- Manual E2E: walk through every critical flow for all 4 roles
+- Cross-role workflows: customer orders → vendor accepts → rider delivers
 
-- Register → Browse vendors → Order gas → Track delivery → Receive
-- Offline mode during tracking
+## Performance Optimization
 
-Vendor flow:
+- Lazy loading and code splitting
+- Bundle optimization (tree shaking, compression)
+- React performance (memoization, virtualization)
+- Database query optimization (N+1, indexes)
 
-- Register → Verify → Manage inventory → Accept order → Update status → Complete
+## Accessibility (WCAG AA)
 
-Rider flow:
+- Keyboard navigation (tab order, focus indicators)
+- ARIA labels on all interactive elements
+- Color contrast ≥ 4.5:1
+- Focus management (modals, drawers)
+- Screen reader compatibility
 
-- Register → Verify → Accept job → Navigate → Pick up → Deliver → View earnings
+## Security
 
-Admin flow:
-
-- Login → Dashboard → Manage users → View analytics → Configure settings
-
----
-
-# Security Testing
-
-Verify (see Security_Checklist.md for full detail):
-
-- SQL Injection, XSS, CSRF prevention
-- JWT tampering rejection
-- Rate limiting enforcement
-- File upload validation
-- RBAC enforcement (cross-role access blocked)
-- No sensitive data exposure
+- Security audit (OWASP Top 10)
+- Authorization review (RBAC on all endpoints)
+- Input validation review (Zod schemas)
+- Rate limiting verification
 - Dependency vulnerability scan
 
----
-
-# Performance Testing
-
-Test (see Performance_Checklist.md for full detail):
-
-## API Targets
-| Metric | Target |
-|--------|--------|
-| p95 response time | < 200 ms |
-| p99 response time | < 500 ms |
-
-## Frontend Targets
-| Metric | Target |
-|--------|--------|
-| FCP | < 2 s |
-| LCP | < 2.5 s |
-| TTI | < 3 s |
-| Lighthouse | ≥ 90 |
-
 ## Reliability
-- API failure handling
-- Database reconnect
-- Queue recovery
-- WebSocket reconnect
-- Payment retry
+
+- Error boundaries at route + component level
+- Offline handling (network detection, cached state, retry)
+- Retry logic for transient failures
+- WebSocket reconnect handling
+
+## Code Quality
+
+- Dead code removal
+- Duplication elimination
+- Folder organization improvements
+- JSDoc on public APIs
 
 ---
 
@@ -119,9 +100,11 @@ Test (see Performance_Checklist.md for full detail):
 
 Provide:
 
-- Test reports with coverage data
-- Bug reports with severity (P0–P4)
-- Fixed issues
-- Performance benchmark results
-- Security audit findings
+- Polished UI across all 4 applications (matching Figma designs)
+- Full regression test suite passing
+- Manual E2E test report
+- Accessibility audit results
+- Security audit results
+- Performance benchmark results (API p95 < 200ms, LCP < 2.5s, Lighthouse ≥ 90)
+- Code quality improvements (dead code removed, duplication eliminated)
 - Release recommendation (go/no-go)

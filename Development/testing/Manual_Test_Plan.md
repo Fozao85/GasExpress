@@ -1,4 +1,4 @@
-# Manual Test Plan — GasNow Platform (Sprints 00–05)
+# Manual Test Plan — GasNow Platform (Sprints 00–07)
 
 ## Prerequisites
 
@@ -188,7 +188,61 @@ This tests the complete lifecycle from order → vendor → rider → delivery.
 
 ---
 
-## 6. Edge Cases to Verify
+## 7. Admin Features (Sprint 07)
+
+Setup: Login as admin (phone `233000000000` / password `Password123!`) at `/admin/login`.
+
+### 7.1 Admin Dashboard
+- [ ] Navigate to `/admin/dashboard`
+- [ ] Verify stat cards show: total customers, vendors, riders, orders
+- [ ] Verify revenue cards show: today, this week, this month, total
+- [ ] Verify average rating cards for vendors and riders
+- [ ] Verify navigation cards link to Users, Vendors, Riders, Orders, Promotions, Settings
+
+### 7.2 User Management
+- [ ] Navigate to `/admin/users`
+- [ ] Verify user table shows all roles (CUSTOMER, VENDOR, RIDER, ADMIN)
+- [ ] Search for a user by name — verify filtering works
+- [ ] Change a user's status (activate/suspend) — verify it takes effect
+- [ ] Verify admin cannot suspend or delete their own account
+- [ ] Delete a test customer account — verify removal
+
+### 7.3 Vendor Approval
+- [ ] Register a new vendor account, then navigate to `/admin/vendors`
+- [ ] Verify pending vendor appears in the list
+- [ ] Tap **Approve** — verify vendor status changes to APPROVED
+- [ ] Verify the vendor can now log in and access their dashboard
+
+### 7.4 Rider Approval
+- [ ] Register a new rider account, then navigate to `/admin/riders`
+- [ ] Verify pending rider appears in the list
+- [ ] Tap **Approve** — verify rider status changes to ACTIVE
+- [ ] Verify the rider can now log in and see available jobs
+
+### 7.5 Order Monitoring
+- [ ] Navigate to `/admin/orders`
+- [ ] Verify order list shows all orders across all vendors
+- [ ] Filter by status (e.g., PENDING, DELIVERED) — verify filtering works
+- [ ] Click an order to see `/admin/orders/:id` detail
+- [ ] Verify detail shows: customer, vendor, rider, items, timeline, payment info
+- [ ] If order is still PENDING, verify cancel button works
+
+### 7.6 Promotion Management
+- [ ] Navigate to `/admin/promotions`
+- [ ] Verify existing promotions are listed (Free Delivery, New Customer Discount, etc.)
+- [ ] Create a new promotion: fill title, discount type, value, dates — submit
+- [ ] Verify new promotion appears in the list
+- [ ] Toggle a promotion active/inactive — verify change
+- [ ] Delete a test promotion — verify removal
+
+### 7.7 Platform Settings
+- [ ] Navigate to `/admin/settings`
+- [ ] Verify form loads with current values (delivery fee, free threshold, support contact)
+- [ ] Update a field (e.g., change support phone) — save
+- [ ] Verify success message appears
+- [ ] Refresh page — verify value persisted
+
+## 8. Edge Cases to Verify
 
 - [ ] **Empty states:** No nearby vendors, no orders, no inventory, no available deliveries
 - [ ] **Error states:** Backend down, network error, invalid form data

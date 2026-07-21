@@ -116,3 +116,13 @@ export async function updateAddress(
     isDefault: address.isDefault,
   };
 }
+
+export async function deleteAddress(userId: string, addressId: string) {
+  const existing = await prisma.address.findUnique({ where: { id: addressId } });
+  if (!existing) throw new NotFoundError('Address');
+  if (existing.userId !== userId) throw new NotFoundError('Address');
+
+  await prisma.address.delete({ where: { id: addressId } });
+
+  return { id: addressId };
+}

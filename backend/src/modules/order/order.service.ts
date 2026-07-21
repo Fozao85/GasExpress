@@ -1,6 +1,8 @@
 import { prisma } from '../../database';
 import { PaymentMethod } from '@prisma/client';
 import { NotFoundError, ValidationError } from '../../common/exceptions/app-error';
+import { notificationService } from '../notifications';
+import { emitNewOrder, emitOrderStatusChange } from '../../websocket/events';
 
 function nullish<T>(val: T | undefined): T | null {
   return val === undefined ? null : val;
@@ -187,13 +189,22 @@ export async function createOrder(
     return created;
   });
 
-  await prisma.notification.create({
-    data: {
-      userId: (await prisma.vendorProfile.findUnique({ where: { id: cart.vendorId } }))!.userId,
+  const vendorProfile = await prisma.vendorProfile.findUnique({ where: { id: cart.vendorId } });
+  if (vendorProfile) {
+    await notificationService.createNotification({
+      userId: vendorProfile.userId,
       title: 'New Order',
       body: `Order ${order.orderNumber} has been placed`,
       notificationType: 'order_placed',
-    },
+    });
+  }
+
+  emitNewOrder(cart.vendorId, {
+    orderId: order.id,
+    orderNumber: order.orderNumber,
+    status: order.orderStatus,
+    customerId: profile.userId,
+    vendorId: cart.vendorId,
   });
 
   return mapOrder(order);
@@ -319,6 +330,13 @@ export async function cancelOrder(customerId: string, orderId: string) {
     });
 
     return cancelled;
+  });
+
+  emitOrderStatusChange(orderId, {
+    orderId,
+    orderNumber: updated.orderNumber,
+    status: 'CANCELLED',
+    customerId: profile.userId,
   });
 
   return mapOrder(updated);

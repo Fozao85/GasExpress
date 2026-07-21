@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { MainLayout } from './layouts/MainLayout';
 
 import { SplashScreen } from './features/customer/screens/SplashScreen';
@@ -34,6 +35,7 @@ import { RiderEarningsScreen } from './features/rider/screens/EarningsScreen';
 import { RiderPendingApprovalScreen } from './features/rider/screens/PendingApprovalScreen';
 import { RiderProfileScreen } from './features/rider/screens/ProfileScreen';
 
+import { NotificationsScreen } from './features/notifications/screens/NotificationsScreen';
 import { AdminLoginScreen } from './features/admin/screens/LoginScreen';
 import { AdminDashboardScreen } from './features/admin/screens/DashboardScreen';
 import { AdminUsersScreen } from './features/admin/screens/UsersScreen';
@@ -53,97 +55,115 @@ import { CartScreen } from './features/customer/screens/CartScreen';
 import { CheckoutScreen } from './features/customer/screens/CheckoutScreen';
 import { OrderConfirmationScreen } from './features/customer/screens/OrderConfirmationScreen';
 import { OrdersScreen } from './features/customer/screens/OrdersScreen';
+import { MobileMoneyPaymentScreen } from './features/payment/screens/MobileMoneyPaymentScreen';
+import { PaymentSuccessScreen } from './features/payment/screens/PaymentSuccessScreen';
+import { PaymentFailedScreen } from './features/payment/screens/PaymentFailedScreen';
 
 export function App() {
   return (
     <AuthProvider>
-      <Routes>
-        {/* Auth screens — no layout */}
-        <Route path="/" element={<SplashScreen />} />
-        <Route path="/customer/splash" element={<SplashScreen />} />
-        <Route path="/customer/welcome" element={<WelcomeScreen />} />
-        <Route path="/role-select" element={<RoleSelectScreen />} />
-        <Route path="/customer/register" element={<RegisterScreen />} />
-        <Route path="/customer/login" element={<LoginScreen />} />
-        <Route path="/customer/otp" element={<OtpScreen />} />
-        <Route path="/customer/forgot-password" element={<ForgotPasswordScreen />} />
-        <Route path="/customer/reset-password" element={<ResetPasswordScreen />} />
+      <ErrorBoundary>
+        <Routes>
+          {/* Auth screens — no layout */}
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/customer/splash" element={<SplashScreen />} />
+          <Route path="/customer/welcome" element={<WelcomeScreen />} />
+          <Route path="/role-select" element={<RoleSelectScreen />} />
+          <Route path="/customer/register" element={<RegisterScreen />} />
+          <Route path="/customer/login" element={<LoginScreen />} />
+          <Route path="/customer/otp" element={<OtpScreen />} />
+          <Route path="/customer/forgot-password" element={<ForgotPasswordScreen />} />
+          <Route path="/customer/reset-password" element={<ResetPasswordScreen />} />
 
-        <Route path="/vendor/login" element={<VendorLoginScreen />} />
-        <Route path="/vendor/register" element={<VendorRegisterScreen />} />
-        <Route path="/vendor/otp" element={<VendorOtpScreen />} />
-        <Route path="/vendor/pending-approval" element={<PendingApprovalScreen />} />
+          <Route path="/vendor/login" element={<VendorLoginScreen />} />
+          <Route path="/vendor/register" element={<VendorRegisterScreen />} />
+          <Route path="/vendor/otp" element={<VendorOtpScreen />} />
+          <Route path="/vendor/pending-approval" element={<PendingApprovalScreen />} />
 
-        <Route path="/rider/login" element={<RiderLoginScreen />} />
-        <Route path="/rider/register" element={<RiderRegisterScreen />} />
-        <Route path="/rider/otp" element={<RiderOtpScreen />} />
-        <Route path="/rider/pending-approval" element={<RiderPendingApprovalScreen />} />
+          <Route path="/rider/login" element={<RiderLoginScreen />} />
+          <Route path="/rider/register" element={<RiderRegisterScreen />} />
+          <Route path="/rider/otp" element={<RiderOtpScreen />} />
+          <Route path="/rider/pending-approval" element={<RiderPendingApprovalScreen />} />
 
-        <Route path="/admin/login" element={<AdminLoginScreen />} />
+          <Route path="/admin/login" element={<AdminLoginScreen />} />
 
-        {/* Customer protected routes */}
-        <Route element={<ProtectedRoute requiredRole="CUSTOMER" redirectTo="/customer/login" />}>
-          <Route element={<MainLayout />}>
-            <Route path="/customer/dashboard" element={<HomeDashboard />} />
-            <Route path="/customer/vendors" element={<VendorListScreen />} />
-            <Route path="/customer/vendors/:id" element={<VendorDetailScreen />} />
-            <Route path="/customer/search" element={<SearchResultsScreen />} />
-            <Route path="/customer/promotions" element={<PromotionsScreen />} />
-            <Route path="/customer/cart" element={<CartScreen />} />
-            <Route path="/customer/checkout" element={<CheckoutScreen />} />
-            <Route path="/customer/orders" element={<OrdersScreen />} />
-            <Route path="/customer/orders/:id/confirmation" element={<OrderConfirmationScreen />} />
-            <Route
-              path="/customer/support"
-              element={
-                <div className="p-4">
-                  <h1 className="text-2xl font-bold text-primary-500">Support</h1>
-                </div>
-              }
-            />
+          {/* Customer protected routes */}
+          <Route element={<ProtectedRoute requiredRole="CUSTOMER" redirectTo="/customer/login" />}>
+            <Route element={<MainLayout />}>
+              <Route path="/customer/dashboard" element={<HomeDashboard />} />
+              <Route path="/customer/vendors" element={<VendorListScreen />} />
+              <Route path="/customer/vendors/:id" element={<VendorDetailScreen />} />
+              <Route path="/customer/search" element={<SearchResultsScreen />} />
+              <Route path="/customer/promotions" element={<PromotionsScreen />} />
+              <Route path="/customer/cart" element={<CartScreen />} />
+              <Route path="/customer/checkout" element={<CheckoutScreen />} />
+              <Route path="/customer/orders" element={<OrdersScreen />} />
+              <Route
+                path="/customer/orders/:id/confirmation"
+                element={<OrderConfirmationScreen />}
+              />
+              <Route path="/customer/payment/:orderId" element={<MobileMoneyPaymentScreen />} />
+              <Route path="/customer/payment/success" element={<PaymentSuccessScreen />} />
+              <Route path="/customer/payment/failed" element={<PaymentFailedScreen />} />
+              <Route
+                path="/customer/support"
+                element={
+                  <div className="p-4">
+                    <h1 className="text-2xl font-bold text-primary-500">Support</h1>
+                  </div>
+                }
+              />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Vendor protected routes */}
-        <Route element={<ProtectedRoute requiredRole="VENDOR" redirectTo="/vendor/login" />}>
-          <Route element={<MainLayout />}>
-            <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
-            <Route path="/vendor/orders" element={<VendorOrdersScreen />} />
-            <Route path="/vendor/orders/:id" element={<VendorOrderDetailScreen />} />
-            <Route path="/vendor/inventory" element={<VendorInventoryScreen />} />
-            <Route path="/vendor/profile" element={<VendorProfileScreen />} />
+          {/* Vendor protected routes */}
+          <Route element={<ProtectedRoute requiredRole="VENDOR" redirectTo="/vendor/login" />}>
+            <Route element={<MainLayout />}>
+              <Route path="/vendor/dashboard" element={<VendorDashboardScreen />} />
+              <Route path="/vendor/orders" element={<VendorOrdersScreen />} />
+              <Route path="/vendor/orders/:id" element={<VendorOrderDetailScreen />} />
+              <Route path="/vendor/inventory" element={<VendorInventoryScreen />} />
+              <Route path="/vendor/profile" element={<VendorProfileScreen />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Rider protected routes */}
-        <Route element={<ProtectedRoute requiredRole="RIDER" redirectTo="/rider/login" />}>
-          <Route element={<MainLayout />}>
-            <Route path="/rider/dashboard" element={<RiderDashboardScreen />} />
-            <Route path="/rider/available" element={<AvailableDeliveriesScreen />} />
-            <Route path="/rider/active" element={<ActiveDeliveryScreen />} />
-            <Route path="/rider/orders/:id" element={<ActiveDeliveryDetailScreen />} />
-            <Route path="/rider/history" element={<DeliveryHistoryScreen />} />
-            <Route path="/rider/earnings" element={<RiderEarningsScreen />} />
-            <Route path="/rider/profile" element={<RiderProfileScreen />} />
+          {/* Rider protected routes */}
+          <Route element={<ProtectedRoute requiredRole="RIDER" redirectTo="/rider/login" />}>
+            <Route element={<MainLayout />}>
+              <Route path="/rider/dashboard" element={<RiderDashboardScreen />} />
+              <Route path="/rider/available" element={<AvailableDeliveriesScreen />} />
+              <Route path="/rider/active" element={<ActiveDeliveryScreen />} />
+              <Route path="/rider/orders/:id" element={<ActiveDeliveryDetailScreen />} />
+              <Route path="/rider/history" element={<DeliveryHistoryScreen />} />
+              <Route path="/rider/earnings" element={<RiderEarningsScreen />} />
+              <Route path="/rider/profile" element={<RiderProfileScreen />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Admin protected routes */}
-        <Route element={<ProtectedRoute requiredRole="ADMIN" redirectTo="/admin/login" />}>
-          <Route element={<MainLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboardScreen />} />
-            <Route path="/admin/users" element={<AdminUsersScreen />} />
-            <Route path="/admin/vendors" element={<AdminVendorsScreen />} />
-            <Route path="/admin/riders" element={<AdminRidersScreen />} />
-            <Route path="/admin/orders" element={<AdminOrdersScreen />} />
-            <Route path="/admin/orders/:id" element={<AdminOrderDetailScreen />} />
-            <Route path="/admin/promotions" element={<AdminPromotionsScreen />} />
-            <Route path="/admin/settings" element={<AdminSettingsScreen />} />
+          {/* Admin protected routes */}
+          <Route element={<ProtectedRoute requiredRole="ADMIN" redirectTo="/admin/login" />}>
+            <Route element={<MainLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboardScreen />} />
+              <Route path="/admin/users" element={<AdminUsersScreen />} />
+              <Route path="/admin/vendors" element={<AdminVendorsScreen />} />
+              <Route path="/admin/riders" element={<AdminRidersScreen />} />
+              <Route path="/admin/orders" element={<AdminOrdersScreen />} />
+              <Route path="/admin/orders/:id" element={<AdminOrderDetailScreen />} />
+              <Route path="/admin/promotions" element={<AdminPromotionsScreen />} />
+              <Route path="/admin/settings" element={<AdminSettingsScreen />} />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Notifications — any authenticated user */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/notifications" element={<NotificationsScreen />} />
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
     </AuthProvider>
   );
 }

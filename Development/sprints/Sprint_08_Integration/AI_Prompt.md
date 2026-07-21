@@ -16,7 +16,7 @@ Read:
 
 # Objective
 
-Integrate external services and connect all applications into one complete ecosystem.
+Integrate real payment processing, maps, notifications, real-time updates, file uploads, and platform services.
 
 ---
 
@@ -24,12 +24,14 @@ Integrate external services and connect all applications into one complete ecosy
 
 ## Payment Integration
 
-Implement:
+Implement a payment abstraction layer supporting:
 
-- Payment provider connection
-- Transaction verification
-- Payment callbacks
-- Payment status updates
+- Mobile Money (phone number → confirm → pay)
+- MTN MoMo
+- Orange Money
+- CASH (on-delivery, preserved)
+
+Each provider via a common interface. Implement webhook handling with signature verification and idempotency.
 
 ---
 
@@ -37,27 +39,33 @@ Implement:
 
 Implement:
 
-- Geolocation services
+- Forward geocoding (address → coordinates)
+- Reverse geocoding (coordinates → address)
 - Distance calculation
-- Route calculation
-- Rider tracking
+- Route directions with ETA
 
 ---
 
 ## Notification System
 
-Implement:
+Implement four channels via a central service:
 
-- Push notifications
-- SMS notifications
-- Email notifications
+- In-app notifications (notification center)
+- Push notifications (Firebase / OneSignal)
+- SMS (transactional alerts)
+- Email (transactional)
 
-Events:
+Events: registration, approval, order placed → accepted → ready → assigned → delivered → cancelled.
 
-- Registration
-- Order creation
-- Order updates
-- Delivery completion
+---
+
+## Real-Time Updates
+
+Implement WebSocket or SSE with:
+
+- JWT-authenticated connections
+- Room-based subscriptions (per order, per vendor, per rider)
+- Live order tracking, vendor dashboard, rider dispatch, customer status
 
 ---
 
@@ -65,33 +73,33 @@ Events:
 
 Implement:
 
-- Image uploads
-- Document uploads
-- Profile images
-- Verification documents
+- Image uploads with validation (type, size)
+- Image compression
+- Upload for: vendor logo, rider photo, delivery proof
 
 ---
 
-## Logging
+## Platform Services
 
 Implement:
 
-- Application logs
-- Error tracking
-- Audit logs
+- Background job queue (Bull / Redis)
+- Retry with exponential backoff
+- Rate limiting middleware
+- Structured logging
+- External service health monitoring with circuit breaker
 
 ---
 
 # Frontend Integration Tasks
 
-Connect:
+See Frontend_Task.md for detailed checklist.
 
-- Authentication APIs
-- Vendor APIs
-- Order APIs
-- Tracking APIs
-- Payment APIs
-- Notification APIs
+- Payments: Mobile Money, MTN MoMo, Orange Money, CASH UIs
+- Maps: Vendor location, address picker, navigation, ETA, route
+- Notifications: In-app center, push handling
+- Real-Time: WebSocket/SSE connection, live updates
+- Uploads: Vendor logo, rider photo, delivery proof
 
 ---
 
@@ -99,9 +107,9 @@ Connect:
 
 Do not:
 
+- Remove CASH payment support
+- Store sensitive payment data insecurely
 - Replace approved APIs
-- Introduce unnecessary services
-- Store sensitive data insecurely
 
 ---
 
@@ -109,7 +117,11 @@ Do not:
 
 Provide:
 
-- Integrated services
-- Environment configuration
-- API connections
+- Integrated payment processing with multiple providers
+- Maps integration (geocoding, distance, directions)
+- Multi-channel notification system
+- Real-time updates via WebSocket/SSE
+- File upload service
+- Platform services (job queue, rate limiting, logging)
 - Integration tests
+- Environment configuration

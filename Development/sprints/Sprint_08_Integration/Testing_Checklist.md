@@ -1,25 +1,53 @@
-# Testing Checklist — Integration
+# Testing Checklist — Platform Integrations
 
 ## Backend Tests
-- [ ] Push notification sent successfully
-- [ ] Payment webhook processes correctly
-- [ ] Invalid webhook signature rejected
-- [ ] Duplicate webhook events ignored (idempotency)
-- [ ] File upload handles valid/invalid files (type, size validation)
-- [ ] File upload compression works
-- [ ] Maps geocoding returns correct results
-- [ ] Queue workers process jobs and retry on failure
-- [ ] Failed jobs route to dead letter queue after max retries
-- [ ] External API timeout handled gracefully
-- [ ] Circuit breaker trips after N failures
-- [ ] Integration health endpoint returns correct status for all services
+- [x] Mobile Money payment initiated and verified
+- [x] MTN MoMo payment flow
+- [x] Orange Money payment flow
+- [x] CASH payment preserved (no gateway call)
+- [x] Payment webhook signature verification functions (SHA256/SHA384)
+- [x] Duplicate webhook events ignored (idempotency via PaymentWebhookLog)
+- [x] Payment status transitions correctly (PENDING → SUCCESS/FAILED)
+- [x] Payment provider registry (all 4 providers, unknown provider throws)
+- [x] All providers return correct reference formats and statuses
+- [ ] Forward geocoding returns correct coordinates
+- [ ] Reverse geocoding returns correct address
+- [ ] Distance calculation accurate
+- [ ] Directions return route + ETA
+- [ ] In-app notification created and delivered
+- [ ] Push notification sent to registered device tokens
+- [ ] SMS notification sent
+- [ ] Email notification sent
+- [ ] Notification marked as read
+- [ ] WebSocket / SSE connection established with valid JWT
+- [ ] WebSocket / SSE connection rejected without valid JWT
+- [ ] Room-based events delivered to correct subscribers only
+- [ ] File upload accepted (valid type + size)
+- [ ] File upload rejected (invalid type)
+- [ ] File upload rejected (exceeds size limit)
+- [ ] Image compression applied
+- [ ] File upload deleted
+- [ ] Queue worker processes notification job
+- [ ] Failed job retried with exponential backoff
+- [ ] Failed job routed to dead letter queue after max retries
+- [ ] Rate limiting blocks excessive requests
+- [ ] Integration health endpoint returns correct status
 
 ## Frontend Tests
-- [ ] Notification tap opens correct screen
+- [x] Payment method selection UI (MobileMoneyPaymentScreen renders providers)
+- [x] Mobile Money payment flow (enter phone, submit calls initiatePayment)
+- [x] CASH payment flow selected (redirects to confirmation)
+- [x] Payment success screen renders
+- [x] Payment failed screen renders with retry option
+- [ ] Map renders vendor location
+- [ ] Address picker with geocoding search
+- [ ] Route visualization on tracking screen
+- [x] In-app notification center renders list
+- [ ] Notification tap navigates to correct screen
 - [ ] Push notification permission flow
-- [ ] Map renders with markers
-- [ ] Upload flow completes with progress indicator
-- [ ] Payment cancellation handled gracefully
-- [ ] Deep links navigate to correct screen
-- [ ] Offline mode detected and banner displayed
-- [ ] Retry failed request on reconnect
+- [x] Live order status updates via WebSocket/SSE (useSocket hook)
+- [x] Socket connection/disconnection (5 tests)
+- [ ] Upload flow with progress indicator
+- [ ] Upload preview before submit
+- [ ] Offline banner displayed on network loss
+- [ ] Failed requests retry on reconnect

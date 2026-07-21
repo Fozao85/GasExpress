@@ -17,6 +17,17 @@ vi.mock('../../../hooks/useDiscovery', () => ({
   useSearchVendors: vi.fn(),
 }));
 
+vi.mock('../../../hooks/useGeolocation', () => ({
+  useGeolocation: () => ({ latitude: null, longitude: null, error: null, isLoading: false }),
+}));
+
+vi.mock('../../../hooks/useMaps', () => ({
+  useReverseGeocode: () => ({ data: null, isLoading: false }),
+  useDistance: () => ({ data: null, isLoading: false }),
+  useGeocode: () => ({ data: [], isLoading: false }),
+  useDirections: () => ({ data: null, isLoading: false }),
+}));
+
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({ user: { fullName: 'John Doe' } }),
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -297,7 +308,7 @@ describe('VendorDetailScreen', () => {
 
     render(<VendorDetailScreen />, { wrapper: createWrapper([detailPath]) });
 
-    expect(screen.getByText('Test Gas Ltd')).toBeInTheDocument();
+    expect(screen.getAllByText('Test Gas Ltd').length).toBeGreaterThan(0);
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('14.5kg Cylinder')).toBeInTheDocument();
     expect(screen.getByText('GHS 120.00')).toBeInTheDocument();

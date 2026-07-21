@@ -7,6 +7,14 @@ import { CheckoutScreen } from './CheckoutScreen';
 import { OrderConfirmationScreen } from './OrderConfirmationScreen';
 import { OrdersScreen } from './OrdersScreen';
 
+vi.mock('../../../hooks/useGeolocation', () => ({
+  useGeolocation: () => ({ latitude: null, longitude: null, error: null, isLoading: false }),
+}));
+
+vi.mock('../../../hooks/useMaps', () => ({
+  useGeocode: () => ({ data: [], isLoading: false }),
+}));
+
 vi.mock('../../../hooks/useOrder', () => ({
   useCart: vi.fn(),
   useUpdateCartItem: vi.fn(),

@@ -97,3 +97,26 @@ gasnow/
 | `npm test` | Run all tests |
 | `npm run lint` | Lint all projects |
 | `npm run build` | Build all projects |
+
+## Roadmap
+
+### ✅ Completed Sprints (00–07)
+
+| Sprint | Feature | Status |
+|--------|---------|--------|
+| 00 | Project Setup | ✅ Complete |
+| 01 | Authentication & User Management | ✅ Complete |
+| 02 | Customer Discovery | ✅ Complete |
+| 03 | Ordering & Checkout | ✅ Complete |
+| 04 | Order Tracking | ✅ Complete |
+| 05 | Vendor Management | ✅ Complete |
+| 06 | Rider Application | ✅ Complete |
+| 07 | Admin Dashboard & Platform Management | ✅ Complete |
+
+### 🔜 Upcoming Sprints
+
+| Sprint | Feature | Description |
+|--------|---------|-------------|
+| 08 | Platform Integrations | Payments (Mobile Money, MTN MoMo, Orange Money), Maps, Notifications (in-app/push/SMS/email), Real-Time Updates (WebSocket/SSE), File Uploads, Platform Services |
+| 09 | Production Readiness & UI Refinement | UI polish across all 4 apps to match Figma designs; QA (regression, performance, accessibility, security, reliability, code quality) |
+| 10 | Deployment & Launch | Docker, CI/CD, monitoring, production PostgreSQL, smoke testing, release |

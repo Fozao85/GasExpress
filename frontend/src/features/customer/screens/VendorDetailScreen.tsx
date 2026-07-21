@@ -6,6 +6,7 @@ import {
   ProductCard,
   LoadingSkeleton,
 } from '../../../components/discovery';
+import { VendorLocationMap } from '../../../components/discovery/VendorLocationMap';
 import { useVendorDetail } from '../../../hooks/useDiscovery';
 import { useAddToCart } from '../../../hooks/useOrder';
 
@@ -79,6 +80,16 @@ export function VendorDetailScreen() {
             Hours: {vendor.openingTime} - {vendor.closingTime}
           </p>
         )}
+
+        {/* Location Map */}
+        <div className="mt-4">
+          <VendorLocationMap
+            vendorName={vendor.businessName}
+            vendorLat={vendor.latitude}
+            vendorLng={vendor.longitude}
+            vendorAddress={vendor.address}
+          />
+        </div>
 
         {vendor.lowestPrice && (
           <p className="text-lg font-bold text-primary-600 mt-3">

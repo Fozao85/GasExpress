@@ -17,6 +17,10 @@ vi.mock('../hooks/useOrder', () => ({
   },
 }));
 
+vi.mock('../hooks/useNotifications', () => ({
+  useUnreadCount: () => ({ data: { count: 0 }, isLoading: false }),
+}));
+
 import { useAuth } from '../contexts/AuthContext';
 
 function createWrapper() {
@@ -113,5 +117,15 @@ describe('MainLayout conditional cart', () => {
 
     render(<MainLayout />, { wrapper: createWrapper() });
     expect(screen.getByText('Logout')).toBeDefined();
+  });
+
+  it('shows notification bell for all roles', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { role: 'CUSTOMER', fullName: 'Test' },
+      logout: vi.fn(),
+    } as any);
+
+    render(<MainLayout />, { wrapper: createWrapper() });
+    expect(screen.getByLabelText('Notifications')).toBeDefined();
   });
 });

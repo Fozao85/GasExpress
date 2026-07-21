@@ -1,123 +1,68 @@
 # Sprint 09 Acceptance Criteria
 
-## Feature Test Matrix
-All major user journeys must pass E2E:
+## Part A — UI/UX Refinement
 
-| Role | Flows |
-|------|-------|
-| Customer | Register, Login, Browse vendors, Order gas, Track delivery, Receive |
-| Vendor | Register, Verify, Manage inventory, Accept/fulfill orders, View revenue, Settings |
-| Rider | Register, Verify, Accept job, Navigate, Pick up, Deliver, View earnings |
-| Admin | Login, Dashboard, Analytics, User management, Settings |
+All screens match high-fidelity Figma designs across:
+- Customer App (Home, Search, Vendor Details, Cart, Checkout, Tracking, History, Profile)
+- Vendor App (Dashboard, Orders, Inventory, Revenue, Settings)
+- Rider App (Dashboard, Jobs, Earnings, History, Pending Approval)
+- Admin Dashboard (Dashboard, Users, Vendors, Riders, Orders, Order Detail, Promotions, Settings)
 
----
+Design system consistency verified:
+- Typography, spacing, colors, shadows, icons match design tokens
+- Cards, buttons, forms, tables, charts have uniform styling
+- Navigation is consistent across all screens within each app
+- Responsive layouts work on mobile, tablet, and desktop
 
-## Backend Quality
-
-Must have:
-
-- Unit tests > 80% coverage
-- API integration tests for all endpoints (success + error)
-- No P0/P1 bugs
-- Queue worker tests (retry, recovery, DLQ)
-- Payment flow tests (webhook, dedup, timeout)
-- WebSocket connection and reconnection tests
+Animations and states:
+- Skeleton loaders on all data-fetching screens
+- Empty states for all list screens
+- Error states for all failure scenarios
+- Success states for all mutation actions
+- Smooth transitions and micro-interactions
 
 ---
 
-## Frontend Quality
+## Part B — Quality Assurance
 
-Must have:
+### Functional
+- All 290+ existing tests pass with no regressions
+- Manual E2E testing completed for all four roles
+- Cross-role workflows verified end-to-end
 
-- Component tests > 70% coverage
-- E2E tests for all critical flows
-- Responsive layouts (mobile, tablet, desktop)
-- Cross-browser testing passed (Chrome, Firefox, Safari, Edge)
-
----
-
-## Performance
-
-Must meet targets:
-
+### Performance
 | Metric | Target |
 |--------|--------|
 | API p95 | < 200 ms |
 | API p99 | < 500 ms |
-| FCP | < 2 s |
 | LCP | < 2.5 s |
-| TTI | < 3 s |
 | Lighthouse | ≥ 90 |
 
----
-
-## Reliability
-
-System must handle:
-
-- Unexpected API failures (graceful error + retry)
-- Database disconnect (auto-reconnect)
-- Queue worker crash (recovery on restart)
-- WebSocket disconnect (auto-reconnect)
-- Payment gateway timeout (retry with notification)
-
----
-
-## Security
-
-Must verify:
-
-- SQL Injection prevented (parameterized queries)
-- XSS prevented (input sanitization, CSP)
-- CSRF protected
-- JWT tampering rejected
-- Rate limiting enforced
-- File upload validated (type, size)
-- RBAC enforced across all roles
-- No sensitive data in logs or responses
-- Dependency vulnerabilities resolved (npm audit)
-
----
-
-## Accessibility (WCAG AA)
-
-Must verify:
-
-- Color contrast ≥ 4.5:1
+### Accessibility (WCAG AA)
 - Keyboard navigation works (tab order, focus indicators)
-- Screen reader compatibility (aria labels, semantic HTML)
+- ARIA labels on all interactive elements
+- Color contrast ≥ 4.5:1
 - Focus management in modals and drawers
-- Text scaling to 200% without loss
+- Screen reader compatible (semantic HTML)
 
----
+### Security
+- RBAC enforced on all endpoints (cross-role access blocked)
+- Input validation on all endpoints (Zod schemas)
+- Rate limiting enforced
+- No sensitive data in logs or responses
+- No critical/high dependency vulnerabilities
 
-## Offline & Mobile
+### Reliability
+- Error boundaries catch and display errors gracefully
+- Offline handling with cached state and retry
+- WebSocket reconnect with exponential backoff
 
-Must handle:
-
-- Offline mode with cached state
-- Retry failed requests on reconnect
-- Poor network (3G throttling)
-- Push permission denied gracefully
-- Deep link navigation from notifications
-
----
-
-## Release Readiness
-
-Release checklist must complete:
-
-- All tests passing
-- No P0/P1 bugs
-- Monitoring configured
-- Error logging enabled
-- Database migrations verified
-- Backup/restore tested
-- Rollback plan documented
-- Release notes prepared
+### Code Quality
+- No dead code or significant duplication
+- JSDoc on all public service methods and controllers
 
 ---
 
 # Definition Of Success
 
-Sprint 09 is complete when the GasNow platform is stable, secure, performant, accessibility-audited, and ready for production deployment with all quality gates passed.
+Sprint 09 is complete when all screens match the Figma designs, the design system is consistently applied, all QA gates pass (functional, performance, accessibility, security, reliability, code quality), and the platform is ready for production deployment.

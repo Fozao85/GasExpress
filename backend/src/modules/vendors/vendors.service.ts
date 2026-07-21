@@ -1,6 +1,7 @@
 import { prisma } from '../../database';
 import { NotFoundError } from '../../common/exceptions/app-error';
 import { config } from '../../config';
+import { emitOrderStatusChange } from '../../websocket/events';
 import type {
   ListVendorsQuery,
   NearbyVendorsQuery,
@@ -822,6 +823,7 @@ export async function updateOrderStatus(userId: string, orderId: string, data: a
 
   const order = await prisma.order.findFirst({
     where: { id: orderId, vendorId: vendor.id },
+    include: { customer: { select: { userId: true } } },
   });
   if (!order) throw new NotFoundError('Order');
 
@@ -852,6 +854,14 @@ export async function updateOrderStatus(userId: string, orderId: string, data: a
       },
     }),
   ]);
+
+  emitOrderStatusChange(orderId, {
+    orderId,
+    orderNumber: updated.orderNumber,
+    status: updated.orderStatus,
+    customerId: order.customer.userId,
+    vendorId: vendor.id,
+  });
 
   return {
     id: updated.id,
